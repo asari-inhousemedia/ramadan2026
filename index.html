@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mein Ramadan Kalender 2026 – Personalisiert für deine Familie</title>
+    <meta name="description"
+        content="Ein magischer, personalisierter Ramadan-Kalender 2026 für die ganze Familie. Öffne jeden Tag ein Türchen und entdecke dein Bayram-Geschenk!">
+    <meta name="theme-color" content="#111a42">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Ramadan 2026">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Mein Ramadan Kalender 2026 🌙">
+    <meta property="og:description"
+        content="Ein magischer Ramadan-Kalender für deine Kinder – jeden Tag ein Türchen, am Bayram das große Geschenk!">
+    <meta property="og:image" content="assets/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="de_DE">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Mein Ramadan Kalender 2026 🌙">
+    <meta name="twitter:description" content="Ein magischer Ramadan-Kalender für deine Kinder – jeden Tag ein Türchen!">
+    <meta name="twitter:image" content="assets/og-image.jpg">
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/icon-192.png">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌙</text></svg>">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Outfit:wght@300;400;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Shooting Stars -->
+    <div class="shooting-stars" id="shootingStars" aria-hidden="true"></div>
+    <!-- Floating Symbols -->
+    <div class="floating-symbols" id="floatingSymbols" aria-hidden="true"></div>
+
+    <!-- Update Banner (hidden by default) -->
+    <div class="update-banner" id="updateBanner" style="display:none;">
+        <span>🔄 Neue Version verfügbar!</span>
+        <button class="update-btn" id="updateBtn">Jetzt aktualisieren</button>
+    </div>
+
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="header-inner">
+            <div class="moon-icon" aria-hidden="true">
+                <div class="moon-glow"></div>
+                <span class="moon-emoji">🌙</span>
+            </div>
+            <div class="header-text">
+                <h1 class="main-title">Mein Ramadan Kalender</h1>
+                <p class="main-subtitle">2026 · Für deine Familie</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Info Card -->
+        <section class="info-card" id="infoCard">
+            <div class="info-card-inner">
+                <p class="info-text">
+                    ⚙️ <strong>Einstellungen</strong> öffnen → Kind anlegen (nur Vorname) → Geschenk-Bild hochladen.
+                    Dann jeden Tag ein Türchen öffnen – am <strong>30. Tag (Bayram)</strong> wird das Bild vollständig
+                    enthüllt! 🎁
+                </p>
+                <p class="info-date">📅 Tag 1: 1. März · Tag 30: 30. März 2026</p>
+            </div>
+        </section>
+
+        <!-- Child Selector -->
+        <section class="child-selector" id="childSelector" style="display:none;">
+            <div class="child-tabs" id="childTabs"></div>
+        </section>
+
+        <!-- Mosaic Counter -->
+        <p class="mosaic-counter" id="mosaicCounter">
+            Dein Bayram-Bild: Noch <span id="tilesLeft">30</span> Teile fehlen!
+        </p>
+
+        <!-- Two-Column Layout: Mosaic + Donation -->
+        <div class="content-columns">
+            <!-- Left: Mosaic Section -->
+            <section class="mosaic-section" id="mosaicSection">
+                <div class="mosaic-wrapper" id="mosaicWrapper">
+                    <div class="mosaic-image" id="mosaicImage">
+                        <img src="" alt="Geschenk-Bild" id="giftImage" style="display:none;">
+                        <div class="mosaic-placeholder" id="mosaicPlaceholder">
+                            <span>🎁</span>
+                            <p>Kein Bild hochgeladen</p>
+                            <a href="setup.html" class="placeholder-link">Jetzt einrichten →</a>
+                        </div>
+                    </div>
+                    <div class="mosaic-grid" id="mosaicGrid"></div>
+                </div>
+            </section>
+
+            <!-- Right: Donation Section -->
+            <aside class="donation-section" id="donationSection">
+                <div class="donation-card">
+                    <div class="donation-icon">🤲</div>
+                    <h2 class="donation-title">Spendenaktion</h2>
+                    <p class="donation-text">
+                        Wir spenden die gesamte Summe an eine vertrauenswürdige Organisation –
+                        damit auch andere Kinder an Bayram eine Freude erleben. 💛
+                    </p>
+                    <a href="https://www.paypal.com/pools/c/9mLJ38uQx8" class="donation-btn paypal-btn" id="donateBtn"
+                        target="_blank" rel="noopener">
+                        💛 Jetzt spenden
+                    </a>
+                    <a href="https://www.instagram.com/ahmetsari.ai?igsh=MXJ2NmxkdjY2NHV4Mw%3D%3D&utm_source=qr"
+                        class="donation-btn instagram-btn" id="instagramBtn" target="_blank" rel="noopener">
+                        📸 Unser Instagram
+                    </a>
+                </div>
+            </aside>
+        </div>
+
+        <!-- Calendar Grid -->
+        <section class="calendar-section" id="calendarSection">
+            <div class="calendar-grid" id="calendarGrid">
+                <!-- Built by JS -->
+            </div>
+        </section>
+
+        <!-- Loading State -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+            <p>Kalender wird geladen…</p>
+        </div>
+
+    </main>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal" id="modal">
+            <button class="modal-close" id="modalClose" aria-label="Schließen">&times;</button>
+            <div class="modal-header">
+                <div class="modal-day-badge" id="modalDayBadge">Tag 1</div>
+            </div>
+            <div class="modal-body">
+                <h3 class="modal-title" id="modalTitle">Tagesaufgabe</h3>
+                <p class="modal-task" id="modalTask">Lade…</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn" id="modalDoneBtn">Ich hab's geschafft! ✨</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Day 30 Celebration Overlay -->
+    <div class="celebration-overlay" id="celebrationOverlay" style="display:none;">
+        <div class="celebration-content">
+            <div class="celebration-emoji">🎉</div>
+            <h2 class="celebration-title">Bayram Mübarek!</h2>
+            <p class="celebration-text">Du hast alle 30 Tage geschafft! Dein Geschenk wartet auf dich! 🎁</p>
+            <button class="celebration-btn" id="celebrationClose">Geschenk enthüllen! 🌟</button>
+        </div>
+        <div class="fireworks" id="fireworks"></div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <nav class="footer-nav">
+            <a href="setup.html" id="setupLink">⚙️ Einstellungen</a>
+            <a href="rechtliches.html" id="legalLink">📜 Rechtliches</a>
+        </nav>
+        <p class="footer-copy">© 2026 Inhouse Media · Mit 💛 gemacht</p>
+    </footer>
+
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Supabase Connection Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Supabase Connection Test</h1>
+    <div id="status">Testing...</div>
+    <div id="output"></div>
+
+    <script>
+        const SUPABASE_URL = 'https://thscbzyzblpqwbskymbg.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_w4wZcJW_TOnzxlgr-kMr5Q_aCu8OxTz';
+
+        async function testConnection() {
+            const statusDiv = document.getElementById('status');
+            const outputDiv = document.getElementById('output');
+
+            try {
+                const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                
+                // Try a simple query - just check if we can connect, maybe list tables or count something
+                // Since we don't know the schema for sure, let's try to query 'completed_days' which is in script.js
+                const { data, error } = await client.from('completed_days').select('count', { count: 'exact', head: true });
+
+                if (error) {
+                    throw error;
+                }
+
+                statusDiv.textContent = 'Success! Connected to Supabase.';
+                statusDiv.style.color = 'green';
+                outputDiv.textContent = 'Connection verified.';
+                
+            } catch (err) {
+                console.error(err);
+                statusDiv.textContent = 'Connection Failed';
+                statusDiv.style.color = 'red';
+                outputDiv.textContent = 'Error: ' + JSON.stringify(err, null, 2);
+            }
+        }
+
+        testConnection();
+    </script>
+</body>
+</html>

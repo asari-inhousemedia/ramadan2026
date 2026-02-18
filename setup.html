@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Einstellungen – Ramadan Kalender 2026</title>
+    <meta name="description" content="Konfiguriere deinen personalisierten Ramadan-Kalender 2026.">
+    <meta name="theme-color" content="#111a42">
+    <meta name="robots" content="noindex">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌙</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Outfit:wght@300;400;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="setup-page">
+        <a href="index.html" class="setup-back" id="backLink">← Zurück zum Kalender</a>
+
+        <div class="setup-header">
+            <h1>⚙️ Einstellungen</h1>
+            <p>Lege deine Kinder an und lade ein Geschenk-Bild hoch.</p>
+        </div>
+
+        <!-- Children Section -->
+        <div class="children-section">
+            <h2>👧🧒 Kinder hinzufügen</h2>
+            <p class="children-count" id="childrenCount">0 / 5 Kinder angelegt</p>
+            <p style="text-align:center; color: var(--text-secondary); font-size: 0.84rem; margin-bottom: 18px;">
+                Nur <strong style="color:var(--gold-light)">Vorname</strong> eingeben – kein Nachname oder andere
+                persönliche Daten.
+                Lade ein Bild hoch, das dein Kind am <strong style="color:var(--gold-light)">30. Tag (Bayram)</strong>
+                als Geschenk bekommt. 🎁
+            </p>
+            <div id="childrenList"></div>
+            <button class="btn-add-child" id="addChildBtn" type="button">
+                ➕ Kind hinzufügen
+            </button>
+        </div>
+
+        <button class="btn-save" id="saveBtn" type="button">
+            💾 Speichern & Zurück
+        </button>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">✅ Gespeichert!</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        /* ======================================
+           SETUP PAGE LOGIC
+           ====================================== */
+
+        const SUPABASE_URL = 'https://thscbzyzblpqwbskymbg.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_w4wZcJW_TOnzxlgr-kMr5Q_aCu8OxTz';
+        const MAX_CHILDREN = 5;
+        const MAX_NAME_LENGTH = 30;
+
+        let supabaseClient = null;
+        try {
+            if (window.supabase && window.supabase.createClient) {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            }
+        } catch (e) { }
+
+        let childCount = 0;
+        let familyId = localStorage.getItem('ramadan_family_id') || null;
+
+        // ========== SANITIZE ==========
+        function sanitize(str) {
+            if (typeof str !== 'string') return '';
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#x27;')
+                .trim()
+                .slice(0, MAX_NAME_LENGTH);
+        }
+
+        // ========== INIT ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            loadExistingData();
+            document.getElementById('addChildBtn').addEventListener('click', () => addChild());
+            document.getElementById('saveBtn').addEventListener('click', saveData);
+        });
+
+        // ========== LOAD EXISTING ==========
+        function loadExistingData() {
+            const stored = localStorage.getItem('ramadan_children');
+            let children = [];
+            try {
+                children = JSON.parse(stored || '[]') || [];
+            } catch (e) { }
+
+            if (children.length > 0) {
+                children.slice(0, MAX_CHILDREN).forEach(child => {
+                    addChild(child.name, child.imageData);
+                });
+            } else {
+                addChild();
+            }
+        }
+
+        // ========== ADD CHILD ==========
+        function addChild(existingName, existingImage) {
+            const currentCards = document.querySelectorAll('.child-card').length;
+            if (currentCards >= MAX_CHILDREN) {
+                showToast('Maximal 5 Kinder möglich!', true);
+                return;
+            }
+
+            childCount++;
+            const list = document.getElementById('childrenList');
+            const idx = childCount;
+
+            const card = document.createElement('div');
+            card.className = 'child-card';
+            card.id = `child-card-${idx}`;
+
+            const safeName = typeof existingName === 'string' ? existingName.replace(/"/g, '&quot;') : '';
+
+            card.innerHTML = `
+                <div class="child-card-header">
+                    <span class="child-card-title">Kind ${idx}</span>
+                    <button class="child-remove-btn" onclick="removeChild(${idx})" type="button" aria-label="Kind ${idx} entfernen">✕</button>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="childName${idx}">Vorname des Kindes</label>
+                    <input type="text" class="form-input child-name-input" id="childName${idx}"
+                        placeholder="z.B. Elif, Yusuf, Leyla …"
+                        value="${safeName}"
+                        maxlength="${MAX_NAME_LENGTH}"
+                        autocomplete="off"
+                        autocorrect="off"
+                        spellcheck="false">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Geschenk-Bild (wird hinter dem Mosaik versteckt)</label>
+                    <div class="file-upload" id="fileUpload${idx}">
+                        <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onchange="handleImageUpload(event, ${idx})" aria-label="Bild hochladen">
+                        <div class="file-upload-icon" id="uploadIcon${idx}">📷</div>
+                        <div class="file-upload-text" id="uploadText${idx}">Bild auswählen oder hierher ziehen</div>
+                        <img class="file-upload-preview" id="preview${idx}" alt="Vorschau">
+                    </div>
+                    <div class="file-upload-actions" id="fileActions${idx}">
+                        <button class="file-action-btn file-action-change" onclick="triggerFileInput(${idx})" type="button">🔄 Bild ändern</button>
+                        <button class="file-action-btn file-action-remove" onclick="removeImage(${idx})" type="button">🗑️ Entfernen</button>
+                    </div>
+                </div>
+            `;
+
+            list.appendChild(card);
+
+            // Load existing image
+            if (existingImage) {
+                const preview = document.getElementById(`preview${idx}`);
+                const actions = document.getElementById(`fileActions${idx}`);
+                const icon = document.getElementById(`uploadIcon${idx}`);
+                const text = document.getElementById(`uploadText${idx}`);
+                preview.src = existingImage;
+                preview.style.display = 'block';
+                if (actions) actions.style.display = 'flex';
+                if (icon) icon.style.display = 'none';
+                if (text) text.style.display = 'none';
+                card.dataset.imageData = existingImage;
+            }
+
+            updateChildrenCount();
+            updateAddButton();
+        }
+
+        // ========== REMOVE CHILD ==========
+        function removeChild(idx) {
+            const card = document.getElementById(`child-card-${idx}`);
+            if (card) {
+                card.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => {
+                    card.remove();
+                    updateChildrenCount();
+                    updateAddButton();
+                }, 280);
+            }
+        }
+
+        // ========== IMAGE UPLOAD ==========
+        function handleImageUpload(event, idx) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Validate file type
+            const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+            if (!allowed.includes(file.type)) {
+                showToast('Nur JPG, PNG, WebP oder GIF erlaubt!', true);
+                return;
+            }
+
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('Bild ist zu groß! Maximal 5 MB.', true);
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const preview = document.getElementById(`preview${idx}`);
+                const actions = document.getElementById(`fileActions${idx}`);
+                const icon = document.getElementById(`uploadIcon${idx}`);
+                const text = document.getElementById(`uploadText${idx}`);
+
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                if (actions) actions.style.display = 'flex';
+                if (icon) icon.style.display = 'none';
+                if (text) text.style.display = 'none';
+
+                const card = document.getElementById(`child-card-${idx}`);
+                if (card) card.dataset.imageData = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function triggerFileInput(idx) {
+            const upload = document.getElementById(`fileUpload${idx}`);
+            if (upload) {
+                const input = upload.querySelector('input[type="file"]');
+                if (input) input.click();
+            }
+        }
+
+        function removeImage(idx) {
+            const preview = document.getElementById(`preview${idx}`);
+            const actions = document.getElementById(`fileActions${idx}`);
+            const icon = document.getElementById(`uploadIcon${idx}`);
+            const text = document.getElementById(`uploadText${idx}`);
+            const card = document.getElementById(`child-card-${idx}`);
+
+            if (preview) { preview.src = ''; preview.style.display = 'none'; }
+            if (actions) actions.style.display = 'none';
+            if (icon) icon.style.display = 'block';
+            if (text) text.style.display = 'block';
+            if (card) delete card.dataset.imageData;
+        }
+
+        // ========== UPDATE UI ==========
+        function updateChildrenCount() {
+            const count = document.querySelectorAll('.child-card').length;
+            const el = document.getElementById('childrenCount');
+            if (el) el.textContent = `${count} / ${MAX_CHILDREN} Kinder angelegt`;
+        }
+
+        function updateAddButton() {
+            const count = document.querySelectorAll('.child-card').length;
+            const btn = document.getElementById('addChildBtn');
+            if (btn) {
+                btn.disabled = count >= MAX_CHILDREN;
+                btn.textContent = count >= MAX_CHILDREN
+                    ? `✅ Maximum erreicht (${MAX_CHILDREN} Kinder)`
+                    : '➕ Kind hinzufügen';
+            }
+        }
+
+        // ========== SAVE ==========
+        async function saveData() {
+            const cards = document.querySelectorAll('.child-card');
+            const children = [];
+
+            cards.forEach(card => {
+                const nameInput = card.querySelector('.child-name-input');
+                const rawName = nameInput ? nameInput.value : '';
+                const name = sanitize(rawName);
+                const imageData = card.dataset.imageData || '';
+
+                if (name) {
+                    children.push({ name, imageData });
+                }
+            });
+
+            if (children.length === 0) {
+                showToast('Bitte mindestens ein Kind anlegen!', true);
+                return;
+            }
+
+            // Save to localStorage
+            localStorage.setItem('ramadan_children', JSON.stringify(children));
+
+            // Save to Supabase
+            if (supabaseClient && familyId) {
+                try {
+                    // Save family record (without images – images stay local for now)
+                    const childrenMeta = children.map(c => ({ name: c.name }));
+                    await supabaseClient.from('families').upsert({
+                        family_id: familyId,
+                        children: childrenMeta,
+                        updated_at: new Date().toISOString()
+                    }, { onConflict: 'family_id' });
+                } catch (e) {
+                    console.warn('[Setup] Supabase save failed:', e);
+                }
+            }
+
+            showToast('✅ Gespeichert!');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1200);
+        }
+
+        // ========== TOAST ==========
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            if (!toast) return;
+            toast.textContent = msg;
+            toast.className = 'toast' + (isError ? ' error' : '');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2800);
+        }
+    </script>
+</body>
+
+</html>

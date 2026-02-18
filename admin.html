@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin – Ramadan Kalender 2026</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔐</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Outfit:wght@300;400;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Login Gate -->
+    <div class="admin-login" id="adminLogin">
+        <h2>🔐 Admin-Bereich</h2>
+        <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:20px;">
+            Dieser Bereich ist nur für den Administrator zugänglich.
+        </p>
+        <input type="password" id="adminPassword" placeholder="Passwort eingeben" autocomplete="current-password">
+        <button onclick="checkPassword()" id="loginBtn">Einloggen</button>
+        <p id="loginError" style="color:#ff6b6b; font-size:0.82rem; margin-top:10px; display:none;">
+            ❌ Falsches Passwort
+        </p>
+    </div>
+
+    <!-- Admin Content (hidden until login) -->
+    <div class="admin-page" id="adminContent" style="display:none;">
+        <a href="index.html" class="setup-back">← Zurück zum Kalender</a>
+
+        <div class="admin-header">
+            <h1>🔐 Admin-Bereich</h1>
+            <p>Alle 30 Türen auf einen Blick – nur für dich sichtbar.</p>
+        </div>
+
+        <!-- Stats -->
+        <div id="adminStats" style="
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 24px;
+        "></div>
+
+        <!-- Doors Grid -->
+        <div class="admin-grid" id="adminGrid">
+            <!-- Built by JS -->
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        /* ======================================
+           ADMIN PAGE LOGIC
+           Only accessible via direct URL
+           ====================================== */
+
+        const SUPABASE_URL = 'https://thscbzyzblpqwbskymbg.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_w4wZcJW_TOnzxlgr-kMr5Q_aCu8OxTz';
+
+        // Admin password – change this to something secure!
+        const ADMIN_PASSWORD_HASH = 'ramadan2026admin';
+
+        let supabaseClient = null;
+        try {
+            if (window.supabase && window.supabase.createClient) {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            }
+        } catch (e) { }
+
+        // Fallback tasks (same as main script)
+        const FALLBACK_TASKS = [
+            { day: 1, icon: '😊', title: 'Lächeln schenken', task: 'Schenke heute jemandem ein ehrliches Lächeln und sag etwas Nettes.' },
+            { day: 2, icon: '🤲', title: 'Dua für andere', task: 'Bete heute ein Dua für jemanden, den du liebst.' },
+            { day: 3, icon: '📖', title: 'Quran lesen', task: 'Lies heute mindestens eine Seite aus dem Quran.' },
+            { day: 4, icon: '🍽️', title: 'Essen teilen', task: 'Teile heute dein Essen mit einem Nachbarn oder Freund.' },
+            { day: 5, icon: '🧹', title: 'Helfen im Haushalt', task: 'Hilf heute ohne gefragt zu werden im Haushalt mit.' },
+            { day: 6, icon: '💌', title: 'Brief schreiben', task: 'Schreibe einen lieben Brief oder eine Nachricht an jemanden.' },
+            { day: 7, icon: '🌳', title: 'Natur genießen', task: 'Gehe heute nach draußen und danke Allah für die Natur.' },
+            { day: 8, icon: '🤝', title: 'Versöhnung', task: 'Versöhne dich heute mit jemandem, mit dem du im Streit warst.' },
+            { day: 9, icon: '💰', title: 'Spenden', task: 'Spende heute etwas – egal wie klein – für einen guten Zweck.' },
+            { day: 10, icon: '🧸', title: 'Spielzeug verschenken', task: 'Verschenke ein Spielzeug, das du nicht mehr brauchst.' },
+            { day: 11, icon: '🕌', title: 'Moschee besuchen', task: 'Besuche heute die Moschee für ein gemeinsames Gebet.' },
+            { day: 12, icon: '👴', title: 'Ältere besuchen', task: 'Besuche oder rufe heute Oma, Opa oder ältere Nachbarn an.' },
+            { day: 13, icon: '🎨', title: 'Kreativ sein', task: 'Male ein schönes Bild zum Thema Ramadan.' },
+            { day: 14, icon: '🙏', title: 'Extra Gebet', task: 'Bete heute ein zusätzliches freiwilliges Gebet.' },
+            { day: 15, icon: '📚', title: 'Geschichte lernen', task: 'Lerne heute eine Geschichte über einen Propheten.' },
+            { day: 16, icon: '🥤', title: 'Wasser schätzen', task: 'Denke heute beim Trinken daran, wie wertvoll Wasser ist.' },
+            { day: 17, icon: '🌙', title: 'Nachtgebet', task: 'Versuche heute Nacht aufzustehen und ein kurzes Gebet zu sprechen.' },
+            { day: 18, icon: '👨‍👩‍👧‍👦', title: 'Familie', task: 'Verbringe heute bewusst Zeit mit deiner Familie.' },
+            { day: 19, icon: '🍪', title: 'Backen', task: 'Backe heute Kekse oder Kuchen und teile sie mit anderen.' },
+            { day: 20, icon: '🗑️', title: 'Aufräumen', task: 'Räume heute dein Zimmer gründlich auf und halte es sauber.' },
+            { day: 21, icon: '🤫', title: 'Geduld üben', task: 'Übe heute besonders viel Geduld – auch wenn es schwer fällt.' },
+            { day: 22, icon: '🎁', title: 'Überraschung', task: 'Überrasche heute jemanden mit einer kleinen Freude.' },
+            { day: 23, icon: '💧', title: 'Dhikr machen', task: 'Sage heute 100 Mal "SubhanAllah" über den Tag verteilt.' },
+            { day: 24, icon: '🌟', title: 'Vorbild sein', task: 'Sei heute ein gutes Vorbild für andere Kinder.' },
+            { day: 25, icon: '📿', title: 'Dankbarkeit', task: 'Schreibe 5 Dinge auf, für die du heute dankbar bist.' },
+            { day: 26, icon: '🕊️', title: 'Frieden stiften', task: 'Hilf heute dabei, einen Streit zwischen anderen zu schlichten.' },
+            { day: 27, icon: '✨', title: 'Lailat al-Qadr', task: 'Heute könnte die Nacht der Bestimmung sein – bete besonders viel!' },
+            { day: 28, icon: '🧕', title: 'Eltern ehren', task: 'Sage heute deinen Eltern, wie sehr du sie liebst.' },
+            { day: 29, icon: '🌅', title: 'Sonnenaufgang', task: 'Stehe heute früh auf und beobachte den Sonnenaufgang.' },
+            { day: 30, icon: '🎉', title: 'Bayram-Vorfreude', task: 'Bereite dich heute auf das Bayram-Fest vor – dein Geschenk wartet! 🎁' }
+        ];
+
+        // ========== PASSWORD CHECK ==========
+        function checkPassword() {
+            const input = document.getElementById('adminPassword').value;
+            if (input === ADMIN_PASSWORD_HASH) {
+                document.getElementById('adminLogin').style.display = 'none';
+                document.getElementById('adminContent').style.display = 'block';
+                loadAdminData();
+            } else {
+                document.getElementById('loginError').style.display = 'block';
+                document.getElementById('adminPassword').value = '';
+                document.getElementById('adminPassword').focus();
+            }
+        }
+
+        // Allow Enter key
+        document.addEventListener('DOMContentLoaded', () => {
+            const pwInput = document.getElementById('adminPassword');
+            if (pwInput) {
+                pwInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') checkPassword();
+                });
+                pwInput.focus();
+            }
+        });
+
+        // ========== LOAD ADMIN DATA ==========
+        async function loadAdminData() {
+            let tasks = [...FALLBACK_TASKS];
+
+            // Try to load from Supabase
+            if (supabaseClient) {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('daily_tasks')
+                        .select('*')
+                        .order('day', { ascending: true });
+
+                    if (!error && data && data.length > 0) {
+                        tasks = data;
+                    }
+                } catch (e) { }
+
+                // Load stats
+                try {
+                    const { count } = await supabaseClient
+                        .from('families')
+                        .select('*', { count: 'exact', head: true });
+
+                    renderStats(count || 0);
+                } catch (e) {
+                    renderStats('–');
+                }
+            }
+
+            renderDoors(tasks);
+        }
+
+        // ========== RENDER STATS ==========
+        function renderStats(familyCount) {
+            const container = document.getElementById('adminStats');
+            if (!container) return;
+
+            const stats = [
+                { label: 'Familien registriert', value: familyCount, icon: '👨‍👩‍👧‍👦' },
+                { label: 'Türen gesamt', value: 30, icon: '🚪' },
+                { label: 'App Version', value: '1.0.0', icon: '📱' }
+            ];
+
+            container.innerHTML = stats.map(s => `
+                <div style="
+                    background: linear-gradient(135deg, var(--bg-accent), var(--bg-mid));
+                    border: 1px solid rgba(212,168,67,0.2);
+                    border-radius: var(--radius-md);
+                    padding: 16px 24px;
+                    text-align: center;
+                    min-width: 140px;
+                ">
+                    <div style="font-size: 1.8rem; margin-bottom: 6px;">${s.icon}</div>
+                    <div style="font-size: 1.4rem; font-weight: 700; color: var(--gold-light);">${s.value}</div>
+                    <div style="font-size: 0.78rem; color: var(--text-secondary);">${s.label}</div>
+                </div>
+            `).join('');
+        }
+
+        // ========== RENDER DOORS ==========
+        function renderDoors(tasks) {
+            const grid = document.getElementById('adminGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            tasks.forEach(task => {
+                const door = document.createElement('div');
+                door.className = 'admin-door';
+                door.innerHTML = `
+                    <div class="admin-door-header">
+                        <div class="admin-door-num">${task.day}</div>
+                        <div class="admin-door-title">${task.icon || '🌙'} ${escapeHtml(task.title)}</div>
+                    </div>
+                    <div class="admin-door-task">${escapeHtml(task.task)}</div>
+                `;
+                grid.appendChild(door);
+            });
+        }
+
+        function escapeHtml(str) {
+            if (typeof str !== 'string') return '';
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+    </script>
+</body>
+
+</html>
