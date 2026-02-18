@@ -82,47 +82,51 @@
         </section>
 
         <!-- Mosaic Counter -->
-        <p class="mosaic-counter" id="mosaicCounter">
-            Dein Bayram-Bild: Noch <span id="tilesLeft">30</span> Teile fehlen!
-        </p>
+
 
         <!-- Two-Column Layout: Mosaic + Donation -->
-        <div class="content-columns">
-            <!-- Left: Mosaic Section -->
-            <section class="mosaic-section" id="mosaicSection">
-                <div class="mosaic-wrapper" id="mosaicWrapper">
-                    <div class="mosaic-image" id="mosaicImage">
-                        <img src="" alt="Geschenk-Bild" id="giftImage" style="display:none;">
-                        <div class="mosaic-placeholder" id="mosaicPlaceholder">
-                            <span>🎁</span>
-                            <p>Kein Bild hochgeladen</p>
-                            <a href="setup.html" class="placeholder-link">Jetzt einrichten →</a>
-                        </div>
+        <!-- 1. MOSAIC SECTION (Image) -->
+        <section class="mosaic-section" id="mosaicSection"
+            style="max-width: 500px; margin: 0 auto 16px auto; width: 100%;">
+            <div class="mosaic-wrapper" id="mosaicWrapper" style="width: 100%; aspect-ratio: 1/1;">
+                <div class="mosaic-image" id="mosaicImage">
+                    <img src="" alt="Geschenk-Bild" id="giftImage" style="display:none;">
+                    <div class="mosaic-placeholder" id="mosaicPlaceholder">
+                        <span>🎁</span>
+                        <p>Kein Bild hochgeladen</p>
+                        <a href="setup.html" class="placeholder-link">Jetzt einrichten →</a>
                     </div>
-                    <div class="mosaic-grid" id="mosaicGrid"></div>
                 </div>
-            </section>
+                <div class="mosaic-grid" id="mosaicGrid"></div>
+            </div>
+            <p class="mosaic-counter" id="mosaicCounter" style="text-align:center; margin-top:10px;">
+                Dein Bayram-Bild: Noch <span id="tilesLeft">30</span> Teile fehlen!
+            </p>
+        </section>
 
-            <!-- Right: Donation Section -->
-            <!-- Right: Compact Donation Section -->
-            <aside class="donation-section" id="donationSection">
-                <div class="donation-card compact">
-                    <div class="donation-header-compact">
-                        <span class="donation-icon-small">💛</span>
-                        <h2 class="donation-title-small">Spendenaktion</h2>
-                    </div>
-                    <p class="donation-text-small">
-                        Wir spenden alles an bedürftige Kinder – für ein freudiges Bayram für alle!
-                    </p>
-                    <div class="donation-actions">
-                        <a href="https://www.paypal.com/pools/c/9mLJ38uQx8" class="donation-btn-small paypal"
-                            target="_blank">💛 Spenden</a>
-                        <a href="https://www.instagram.com/ahmetsari.ai" class="donation-btn-small instagram"
-                            target="_blank">📸 Instagram</a>
-                    </div>
+        <!-- 2. DONATION SECTION (Middle) -->
+        <aside class="donation-section" id="donationSection"
+            style="max-width: 500px; margin: 0 auto 32px auto; width: 100%;">
+            <div class="donation-card compact">
+                <div class="donation-header-compact">
+                    <span class="donation-icon-small">💛</span>
+                    <h2 class="donation-title-small">Spendenaktion</h2>
                 </div>
-            </aside>
-        </div>
+                <p class="donation-text-small">
+                    Wir spenden alles an bedürftige Kinder – für ein freudiges Bayram für alle!
+                </p>
+                <div class="donation-actions">
+                    <a href="https://www.paypal.com/pools/c/9mLJ38uQx8" class="donation-btn-small paypal"
+                        target="_blank">💛 Spenden</a>
+                    <a href="https://www.instagram.com/ahmetsari.ai" class="donation-btn-small instagram"
+                        target="_blank" style="flex-direction:column; gap:0px; padding:4px;">
+                        <span>📸 Instagram</span>
+                        <span style="font-size:0.6rem; font-weight:400; opacity:0.85; line-height:1;">(Updates zur
+                            Spende)</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
 
         <!-- Calendar Grid -->
         <section class="calendar-section" id="calendarSection">
