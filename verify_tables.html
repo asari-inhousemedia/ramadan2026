@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Supabase Tabellen-Check</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #111;
+            color: #eee;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #333;
+        }
+
+        .success {
+            background: #1b5e20;
+            border-color: #2e7d32;
+            color: #fff;
+        }
+
+        .error {
+            background: #b71c1c;
+            border-color: #d32f2f;
+            color: #fff;
+        }
+
+        .loading {
+            background: #0d47a1;
+            color: #fff;
+        }
+
+        code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+    <h1>Datenbank-Check</h1>
+    <div id="results"></div>
+
+    <script>
+        const SUPABASE_URL = 'https://thscbzyzblpqwbskymbg.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_w4wZcJW_TOnzxlgr-kMr5Q_aCu8OxTz';
+        const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const results = document.getElementById('results');
+
+        function log(msg, type = 'loading') {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = msg;
+            results.appendChild(div);
+        }
+
+        async function checkTables() {
+            log('⏳ Prüfe Verbindung und Tabellen...', 'loading');
+
+            // 1. Check daily_tasks (should have 30 rows)
+            try {
+                const { data, error, count } = await client
+                    .from('daily_tasks')
+                    .select('*', { count: 'exact', head: true });
+
+                if (error) throw error;
+
+                if (count === 30) {
+                    log(`✅ Tabelle <code>daily_tasks</code> existiert und enthält ${count} Aufgaben.`, 'success');
+                } else {
+                    log(`⚠️ Tabelle <code>daily_tasks</code> existiert, hat aber ${count} Einträge (erwartet: 30). Hast du das SQL-Script ausgeführt?`, 'error');
+                }
+            } catch (e) {
+                log(`❌ Tabelle <code>daily_tasks</code> nicht gefunden oder nicht zugreifbar. Fehlermeldung: ${e.message}`, 'error');
+            }
+
+            // 2. Check families
+            try {
+                const { error } = await client.from('families').select('id').limit(1);
+                if (error && error.code !== 'PGRST116') throw error; // PGRST116 is just "no rows", which is fine
+                log(`✅ Tabelle <code>families</code> ist bereit.`, 'success');
+            } catch (e) {
+                log(`❌ Tabelle <code>families</code> Problem: ${e.message}`, 'error');
+            }
+
+            // 3. Check progress
+            try {
+                const { error } = await client.from('progress').select('id').limit(1);
+                if (error && error.code !== 'PGRST116') throw error;
+                log(`✅ Tabelle <code>progress</code> ist bereit.`, 'success');
+            } catch (e) {
+                log(`❌ Tabelle <code>progress</code> Problem: ${e.message}`, 'error');
+            }
+        }
+
+        checkTables();
+    </script>
+</body>
+
+</html>
