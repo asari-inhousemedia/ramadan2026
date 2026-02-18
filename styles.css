@@ -33,7 +33,9 @@
     --font-body: 'Outfit', sans-serif;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -85,13 +87,18 @@ a:hover {
     padding: 12px 20px;
     font-size: 0.9rem;
     font-weight: 600;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
     animation: slideDown 0.4s ease;
 }
 
 @keyframes slideDown {
-    from { transform: translateY(-100%); }
-    to { transform: translateY(0); }
+    from {
+        transform: translateY(-100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
 }
 
 .update-btn {
@@ -127,7 +134,7 @@ a:hover {
     background: #fff;
     border-radius: 50%;
     animation: shootingStar var(--duration) linear forwards;
-    box-shadow: 0 0 6px 2px rgba(255,255,255,0.8);
+    box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.8);
 }
 
 .shooting-star::after {
@@ -137,15 +144,28 @@ a:hover {
     right: 0;
     width: 80px;
     height: 1px;
-    background: linear-gradient(90deg, rgba(255,255,255,0.5), transparent);
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.5), transparent);
     transform: translateY(-50%);
 }
 
 @keyframes shootingStar {
-    0% { opacity: 0; transform: translate(0, 0) rotate(var(--angle)); }
-    10% { opacity: 1; }
-    70% { opacity: 1; }
-    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--angle)); }
+    0% {
+        opacity: 0;
+        transform: translate(0, 0) rotate(var(--angle));
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    70% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(var(--dx), var(--dy)) rotate(var(--angle));
+    }
 }
 
 /* ========== FLOATING SYMBOLS ========== */
@@ -163,15 +183,32 @@ a:hover {
     animation: floatSymbol var(--float-dur, 18s) ease-in-out infinite;
     animation-delay: var(--delay, 0s);
     opacity: 0;
-    filter: drop-shadow(0 0 4px rgba(255,255,255,0.15));
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.15));
 }
 
 @keyframes floatSymbol {
-    0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
-    8% { opacity: 0.6; }
-    50% { transform: translate(var(--mx, 30px), var(--my, -80px)) rotate(180deg); opacity: 0.4; }
-    92% { opacity: 0.5; }
-    100% { transform: translate(var(--ex, -20px), var(--ey, -160px)) rotate(360deg); opacity: 0; }
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+        opacity: 0;
+    }
+
+    8% {
+        opacity: 0.6;
+    }
+
+    50% {
+        transform: translate(var(--mx, 30px), var(--my, -80px)) rotate(180deg);
+        opacity: 0.4;
+    }
+
+    92% {
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: translate(var(--ex, -20px), var(--ey, -160px)) rotate(360deg);
+        opacity: 0;
+    }
 }
 
 /* ========== HEADER ========== */
@@ -213,13 +250,27 @@ a:hover {
 }
 
 @keyframes moonFloat {
-    0%, 100% { transform: translateY(0) rotate(-8deg); }
-    50% { transform: translateY(-10px) rotate(5deg); }
+
+    0%,
+    100% {
+        transform: translateY(0) rotate(-8deg);
+    }
+
+    50% {
+        transform: translateY(-10px) rotate(5deg);
+    }
 }
 
 @keyframes moonGlow {
-    0% { opacity: 0.4; transform: scale(1); }
-    100% { opacity: 1; transform: scale(1.15); }
+    0% {
+        opacity: 0.4;
+        transform: scale(1);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1.15);
+    }
 }
 
 .header-text {
@@ -270,7 +321,7 @@ a:hover {
     border-radius: var(--radius-lg);
     padding: 18px 22px;
     text-align: center;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
 }
 
 .info-text {
@@ -420,8 +471,15 @@ a:hover {
 }
 
 @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.08); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.08);
+    }
 }
 
 .mosaic-grid {
@@ -449,7 +507,7 @@ a:hover {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.04) 0%, transparent 50%);
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.04) 0%, transparent 50%);
     z-index: 1;
 }
 
@@ -468,9 +526,21 @@ a:hover {
 }
 
 @keyframes tileReveal {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.1) rotateY(90deg); opacity: 0.5; }
-    100% { transform: scale(1); opacity: 0; background: transparent; }
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.1) rotateY(90deg);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 0;
+        background: transparent;
+    }
 }
 
 /* ========== DONATION SECTION ========== */
@@ -586,7 +656,7 @@ a:hover {
     background: var(--tile-bg);
     border: 2px solid rgba(100, 140, 220, 0.22);
     transition: all var(--transition-fast);
-    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
     user-select: none;
     -webkit-tap-highlight-color: transparent;
 }
@@ -596,13 +666,13 @@ a:hover {
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    background: repeating-conic-gradient(rgba(255,255,255,0.015) 0% 25%, transparent 0% 50%) 0 0 / 10px 10px;
+    background: repeating-conic-gradient(rgba(255, 255, 255, 0.015) 0% 25%, transparent 0% 50%) 0 0 / 10px 10px;
 }
 
 .calendar-day:hover {
     transform: translateY(-3px) scale(1.06);
     border-color: rgba(150, 180, 255, 0.5);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
     background: var(--bg-light);
 }
 
@@ -634,8 +704,15 @@ a:hover {
 }
 
 @keyframes todayPulse {
-    0%, 100% { box-shadow: 0 0 18px rgba(212, 168, 67, 0.3); }
-    50% { box-shadow: 0 0 30px rgba(212, 168, 67, 0.55); }
+
+    0%,
+    100% {
+        box-shadow: 0 0 18px rgba(212, 168, 67, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 0 30px rgba(212, 168, 67, 0.55);
+    }
 }
 
 .calendar-day.locked {
@@ -675,7 +752,9 @@ a:hover {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* ========== MODAL ========== */
@@ -686,7 +765,7 @@ a:hover {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0,0,0,0.65);
+    background: rgba(0, 0, 0, 0.65);
     backdrop-filter: blur(6px);
     opacity: 0;
     visibility: hidden;
@@ -707,7 +786,7 @@ a:hover {
     max-width: 400px;
     transform: scale(0.85) translateY(25px);
     transition: transform var(--transition-med);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 50px rgba(212, 168, 67, 0.1);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 50px rgba(212, 168, 67, 0.1);
     overflow: hidden;
     position: relative;
 }
@@ -805,7 +884,7 @@ a:hover {
     position: fixed;
     inset: 0;
     z-index: 2000;
-    background: rgba(0,0,0,0.88);
+    background: rgba(0, 0, 0, 0.88);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -814,8 +893,13 @@ a:hover {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .celebration-content {
@@ -833,8 +917,15 @@ a:hover {
 }
 
 @keyframes celebrationPop {
-    from { transform: scale(0.5); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
+    from {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 .celebration-emoji {
@@ -844,8 +935,13 @@ a:hover {
 }
 
 @keyframes bounce {
-    from { transform: translateY(0); }
-    to { transform: translateY(-12px); }
+    from {
+        transform: translateY(0);
+    }
+
+    to {
+        transform: translateY(-12px);
+    }
 }
 
 .celebration-title {
@@ -904,6 +1000,7 @@ a:hover {
         transform: translate(0, 0) scale(1);
         opacity: 1;
     }
+
     100% {
         transform: translate(var(--fw-x, 80px), var(--fw-y, -80px)) scale(0);
         opacity: 0;
@@ -949,8 +1046,15 @@ a:hover {
 }
 
 @keyframes confettiFall {
-    0% { transform: translateY(0) rotate(0); opacity: 1; }
-    100% { transform: translateY(100vh) rotate(var(--rot, 720deg)); opacity: 0; }
+    0% {
+        transform: translateY(0) rotate(0);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(100vh) rotate(var(--rot, 720deg));
+        opacity: 0;
+    }
 }
 
 /* ========== SETUP PAGE ========== */
@@ -1055,8 +1159,15 @@ a:hover {
 }
 
 @keyframes slideIn {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .child-card-header {
@@ -1242,7 +1353,7 @@ a:hover {
     border-radius: 30px;
     font-weight: 600;
     font-size: 0.9rem;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
     z-index: 2000;
     transition: transform 0.4s ease;
     pointer-events: none;
@@ -1421,7 +1532,8 @@ a:hover {
     border-bottom: 1px solid rgba(100, 140, 220, 0.12);
 }
 
-.legal-page p, .legal-page li {
+.legal-page p,
+.legal-page li {
     color: var(--text-secondary);
     line-height: 1.8;
     margin-bottom: 8px;
@@ -1528,4 +1640,140 @@ a:hover {
     .donation-card {
         padding: 20px 14px;
     }
+}
+
+/* ========== OPTIMIZED MOBILE STYLES (User Request) ========== */
+
+/* Setup Button in Header */
+.setup-btn-small {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 6px 16px;
+    border: 1px solid rgba(212, 168, 67, 0.35);
+    border-radius: 20px;
+    color: var(--gold-light);
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    background: rgba(13, 21, 53, 0.3);
+    backdrop-filter: blur(4px);
+    transition: all 0.2s ease;
+}
+
+.setup-btn-small:hover {
+    background: rgba(212, 168, 67, 0.15);
+    border-color: var(--gold-primary);
+    transform: translateY(-1px);
+}
+
+/* Compact Donation Card */
+.donation-card.compact {
+    padding: 14px;
+    border-radius: var(--radius-md);
+    background: rgba(13, 21, 53, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.donation-header-compact {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.donation-icon-small {
+    font-size: 1.1rem;
+    animation: none;
+    /* No pulse to save distraction */
+}
+
+.donation-title-small {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    color: var(--gold-light);
+    margin: 0;
+}
+
+.donation-text-small {
+    text-align: center;
+    font-size: 0.75rem;
+    line-height: 1.35;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    opacity: 0.85;
+}
+
+.donation-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.donation-btn-small {
+    padding: 6px 4px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+    color: #fff;
+    text-decoration: none !important;
+    transition: transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border: none;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.donation-btn-small:hover {
+    transform: scale(1.02);
+    opacity: 0.95;
+}
+
+.donation-btn-small.paypal {
+    background: linear-gradient(135deg, #d4a843, #b8860b);
+    box-shadow: 0 2px 8px rgba(212, 168, 67, 0.25);
+}
+
+.donation-btn-small.instagram {
+    background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);
+    box-shadow: 0 2px 8px rgba(225, 48, 108, 0.25);
+}
+
+/* Mobile Priority Order & Layout */
+@media (max-width: 768px) {
+    .content-columns {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    /* 1. Mosaik (Image) comes FIRST */
+    .mosaic-section {
+        order: 1;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-bottom: 4px;
+    }
+
+    .mosaic-wrapper {
+        width: 100%;
+        max-width: 320px;
+        /* Optimal size for mobile screens */
+        aspect-ratio: 1/1;
+    }
+
+    /* 2. Donation comes SECOND and is smaller */
+    .donation-section {
+        order: 2;
+        width: 100%;
+        max-width: 340px;
+        margin: 0 auto 20px auto;
+        /* Space before calendar */
+    }
+
+    /* 3. Calendar Grid (already below main content) */
 }

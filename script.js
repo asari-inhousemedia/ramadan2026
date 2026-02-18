@@ -390,13 +390,21 @@ function updateImageBlur() {
     const total = 30;
 
     if (revealed >= total) {
-        // Day 30: crystal clear!
+        // Tag 30: Bild kristallklar!
         img.style.filter = 'none';
     } else {
+        // Bis Tag 29 bleibt es "milchig" (mind. 6px Blur), um Spannung zu halten
         const progress = revealed / total;
-        const blurAmount = Math.max(1.5, (1 - progress) * 20);
-        const saturation = 0.2 + progress * 0.8;
-        const brightness = 0.7 + progress * 0.3;
+
+        // Start: 25px Blur -> Ende (Tag 29): 6px Blur
+        const minBlur = 6;
+        const maxBlur = 30;
+        const blurAmount = maxBlur - (progress * (maxBlur - minBlur));
+
+        // Sättigung und Helligkeit langsam erhöhen
+        const saturation = 0.4 + progress * 0.6; // Von 40% auf 100%
+        const brightness = 0.8 + progress * 0.2; // Von 80% auf 100%
+
         img.style.filter = `blur(${blurAmount}px) saturate(${saturation}) brightness(${brightness})`;
     }
 }
