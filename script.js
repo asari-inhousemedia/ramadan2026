@@ -6,7 +6,7 @@
 // ========== SUPABASE CONFIG ==========
 const SUPABASE_URL = 'https://thscbzyzblpqwbskymbg.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_w4wZcJW_TOnzxlgr-kMr5Q_aCu8OxTz';
-const APP_VERSION = '1.1.5';
+const APP_VERSION = '1.1.6';
 
 let supabaseClient = null;
 try {
@@ -944,6 +944,7 @@ function buildCalendarGrid() {
             isLocked = true;
         }
 
+        const tasksForThisDay = dailyTasks.filter(task => task.day === i);
         const completedForThisDay = tasksForThisDay.filter(task => completedTasks.includes(task.id));
 
         if (completedForThisDay.length > 0 && !isLocked) {
