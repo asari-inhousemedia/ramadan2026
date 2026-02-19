@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Anmelden | Ramadan Kalender 2026</title>
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Outfit:wght@300;400;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Supabase JS -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+    <style>
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .login-card {
+            background: rgba(13, 21, 53, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 168, 67, 0.3);
+            border-radius: 24px;
+            padding: 32px 24px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-header h1 {
+            font-family: var(--font-display);
+            color: var(--gold-primary);
+            font-size: 2rem;
+            margin-bottom: 8px;
+            text-shadow: 0 0 15px rgba(212, 168, 67, 0.4);
+        }
+
+        .login-header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            color: var(--gold-light);
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-family: var(--font-body);
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--gold-primary);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 14px;
+            border: none;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+            color: #050a18;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: transform 0.2s;
+        }
+
+        .auth-btn:active {
+            transform: scale(0.98);
+        }
+
+        .auth-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .toggle-text {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .toggle-link {
+            color: var(--gold-light);
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .moon-icon-small {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            display: inline-block;
+            filter: drop-shadow(0 0 10px rgba(245, 200, 66, 0.6));
+        }
+
+        .error-msg {
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            margin-top: 12px;
+            display: none;
+            background: rgba(255, 0, 0, 0.1);
+            padding: 8px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="stars"></div>
+    <div class="shooting-star"></div>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="moon-icon-small">🌙</div>
+
+            <div class="login-header">
+                <h1 id="pageTitle">Anmelden</h1>
+                <p id="pageSubtitle">
+                    Melde dich an, um den Ramadan Kalender deiner Kinder sicher zu speichern.
+                </p>
+            </div>
+
+            <form id="authForm" onsubmit="handleAuth(event)">
+                <div class="input-group">
+                    <label for="email">E-Mail Adresse</label>
+                    <input type="email" id="email" placeholder="name@beispiel.de" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="password">Passwort</label>
+                    <input type="password" id="password" placeholder="Mindestens 6 Zeichen" required minlength="6">
+                </div>
+
+                <button type="submit" class="auth-btn" id="submitBtn">Anmelden</button>
+                <div id="errorMsg" class="error-msg"></div>
+            </form>
+
+            <p class="toggle-text">
+                <span id="toggleQuestion">Noch kein Konto?</span>
+                <span class="toggle-link" onclick="toggleMode()" id="toggleBtn">Hier registrieren</span>
+            </p>
+        </div>
+
+        <p style="margin-top: 24px; font-size: 0.8rem; opacity: 0.6;">
+            Deine Daten sind sicher. Wir versenden keine Werbung.
+        </p>
+    </div>
+
+    <!-- Script: Auth Logic -->
+    <script>
+        // Config Supabase
+        const SUPABASE_URL = 'https://thscbzyzblpqwbskymbg.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_w4wZcJW_TOnzxlgr-kMr5Q_aCu8OxTz';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let isLoginMode = true;
+
+        // Check if already logged in -> Redirect
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session) {
+                window.location.href = 'index.html';
+            }
+        });
+
+        function toggleMode() {
+            isLoginMode = !isLoginMode;
+            const title = document.getElementById('pageTitle');
+            const sub = document.getElementById('pageSubtitle');
+            const btn = document.getElementById('submitBtn');
+            const q = document.getElementById('toggleQuestion');
+            const tBtn = document.getElementById('toggleBtn');
+            const err = document.getElementById('errorMsg');
+
+            err.style.display = 'none';
+
+            if (isLoginMode) {
+                title.textContent = 'Anmelden';
+                sub.textContent = 'Willkommen zurück! Melde dich an, um deinen Fortschritt zu sehen.';
+                btn.textContent = 'Anmelden';
+                q.textContent = 'Noch kein Konto?';
+                tBtn.textContent = 'Hier registrieren';
+            } else {
+                title.textContent = 'Registrieren';
+                sub.textContent = 'Erstelle ein kostenloses Konto für deine Familie (dauert nur 10 Sekunden).';
+                btn.textContent = 'Konto erstellen';
+                q.textContent = 'Schon registriert?';
+                tBtn.textContent = 'Hier anmelden';
+            }
+        }
+
+        async function handleAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('submitBtn');
+            const err = document.getElementById('errorMsg');
+
+            btn.disabled = true;
+            btn.textContent = 'Lade...';
+            err.style.display = 'none';
+
+            try {
+                let result;
+                if (isLoginMode) {
+                    // LOGIN
+                    result = await supabase.auth.signInWithPassword({ email, password });
+                } else {
+                    // SIGN UP
+                    result = await supabase.auth.signUp({
+                        email,
+                        password,
+                        options: {
+                            // WICHTIG: Wenn "Confirm Email" aus ist, wird der User sofort eingeloggt.
+                        }
+                    });
+                }
+
+                if (result.error) throw result.error;
+
+                // Success!
+                // Prüfen ob Session da ist
+                if (result.data.session) {
+                    // Speichern einer Flag im LocalStorage, damit wir wissen, dass wir evtl Daten migrieren müssen (optional)
+                    if (!isLoginMode) {
+                        localStorage.setItem('is_new_signup', 'true');
+                    }
+                    window.location.href = 'index.html';
+                } else if (!isLoginMode && !result.data.session) {
+                    // Fallback: Confirm Email ist vllt doch an?
+                    err.textContent = 'Bitte prüfe deine E-Mails für die Bestätigung!';
+                    err.style.display = 'block';
+                }
+
+            } catch (error) {
+                console.error(error);
+                let msg = error.message;
+                if (msg.includes('Invalid login credentials')) msg = 'Falsche E-Mail oder Passwort.';
+                if (msg.includes('User already registered')) msg = 'Diese E-Mail ist bereits registriert.';
+                if (msg.includes('Password should be')) msg = 'Passwort muss mindestens 6 Zeichen haben.';
+
+                err.textContent = msg;
+                err.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = isLoginMode ? 'Anmelden' : 'Konto erstellen';
+            }
+        }
+    </script>
+</body>
+
+</html>

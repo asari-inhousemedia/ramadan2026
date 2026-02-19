@@ -163,9 +163,27 @@ function showUpdateBanner(worker) {
 
 // ========== INIT ==========
 document.addEventListener('DOMContentLoaded', async () => {
+    // Only run on main calendar page
     if (!document.getElementById('calendarGrid')) return;
 
-    initFamilyId();
+    // 1. AUTH CHECK
+    if (!supabaseClient) {
+        console.error('[Ramadan] Supabase not initialized');
+        return;
+    }
+
+    const { data: { session } } = await supabaseClient.auth.getSession();
+
+    if (!session) {
+        // Not logged in -> Go to login
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Set familyId to User ID (Persistent across devices)
+    familyId = session.user.id;
+    console.log('[Auth] User session found:', familyId);
+
     registerServiceWorker();
     createFloatingSymbols();
     startShootingStars();

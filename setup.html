@@ -50,12 +50,12 @@
             <h2>👧🧒 Kinder hinzufügen</h2>
             <p class="children-count" id="childrenCount">0 / 5 Kinder angelegt</p>
 
-            <!-- Copy Link Feature -->
+            <!-- Logout Section -->
             <div style="text-align:center; margin-bottom: 24px;">
-                <button id="copyLinkBtn" type="button" style="
-                    background: rgba(212, 168, 67, 0.15);
-                    border: 1px solid var(--gold-primary);
-                    color: var(--gold-light);
+                <button id="logoutBtn" type="button" style="
+                    background: rgba(255, 100, 100, 0.1);
+                    border: 1px solid #ff6b6b;
+                    color: #ff6b6b;
                     padding: 8px 16px;
                     border-radius: 20px;
                     font-size: 0.85rem;
@@ -64,10 +64,10 @@
                     align-items: center;
                     gap: 6px;
                 ">
-                    🔗 Link für andere Geräte kopieren
+                    🚪 Abmelden
                 </button>
                 <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px; opacity: 0.7;">
-                    Nutze diesen Link, um den Kalender auf einem anderen Handy zu öffnen.
+                    Du bist aktuell eingeloggt.
                 </p>
             </div>
 
@@ -105,12 +105,30 @@
         let supabaseClient = null;
         try {
             if (window.supabase && window.supabase.createClient) {
-                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
             }
         } catch (e) { }
 
+        let children = [];
+        let familyId = null;
         let childCount = 0;
-        let familyId = localStorage.getItem('ramadan_family_id') || null;
+
+        // AUTH CHECK & INIT
+        async function init() {
+            if (!supabaseClient) return;
+
+            const { data: { session }, error } = await supabaseClient.auth.getSession();
+            if (error || !session) {
+                window.location.href = 'login.html';
+                return;
+            }
+            familyId = session.user.id;
+            console.log('[Auth] Logged in as:', familyId);
+
+            loadData();
+        }
+
+        init();
 
         // ========== SANITIZE ==========
         function sanitize(str) {
@@ -125,17 +143,23 @@
                 .slice(0, MAX_NAME_LENGTH);
         }
 
-        // ========== INIT ==========
+        // ========== INIT EVENT LISTENERS ==========
         document.addEventListener('DOMContentLoaded', () => {
-            loadExistingData();
             document.getElementById('addChildBtn').addEventListener('click', () => addChild());
             document.getElementById('saveBtn').addEventListener('click', saveData);
 
-            const copyBtn = document.getElementById('copyLinkBtn');
-            if (copyBtn) {
-                copyBtn.addEventListener('click', copyFamilyLink);
+            const logout = document.getElementById('logoutBtn');
+            if (logout) {
+                logout.addEventListener('click', handleLogout);
             }
         });
+
+        async function handleLogout() {
+            if (confirm('Möchtest du dich wirklich abmelden?')) {
+                await supabaseClient.auth.signOut();
+                window.location.href = 'login.html';
+            }
+        }
 
         // ========== COPY LINK ==========
         function copyFamilyLink() {
@@ -153,16 +177,43 @@
             });
         }
 
-        // ========== LOAD EXISTING ==========
-        function loadExistingData() {
+        // ========== LOAD DATA ==========
+        async function loadData() {
+            // 1. Try Supabase
+            if (supabaseClient && familyId) {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('families')
+                        .select('*')
+                        .eq('family_id', familyId)
+                        .single();
+
+                    if (!error && data && data.children) {
+                        const list = document.getElementById('childrenList');
+                        list.innerHTML = '';
+                        childCount = 0;
+
+                        data.children.forEach(child => {
+                            addChild(child.name, child.imageData);
+                        });
+                        return;
+                    }
+                } catch (e) { }
+            }
+
+            // 2. Fallback to localStorage (Migration)
             const stored = localStorage.getItem('ramadan_children');
-            let children = [];
+            let localChildren = [];
             try {
-                children = JSON.parse(stored || '[]') || [];
+                localChildren = JSON.parse(stored || '[]') || [];
             } catch (e) { }
 
-            if (children.length > 0) {
-                children.slice(0, MAX_CHILDREN).forEach(child => {
+            const list = document.getElementById('childrenList');
+            list.innerHTML = '';
+            childCount = 0;
+
+            if (localChildren.length > 0) {
+                localChildren.slice(0, MAX_CHILDREN).forEach(child => {
                     addChild(child.name, child.imageData);
                 });
             } else {
@@ -349,17 +400,16 @@
                 return;
             }
 
-            // Save to localStorage
+            // Save to localStorage (Local Cache)
             localStorage.setItem('ramadan_children', JSON.stringify(children));
 
-            // Save to Supabase
+            // Save to Supabase (Secure Cloud Backup)
             if (supabaseClient && familyId) {
                 try {
-                    // Save family record (without images – images stay local for now)
-                    const childrenMeta = children.map(c => ({ name: c.name }));
+                    // We save full data including images to Supabase for the login persistence
                     await supabaseClient.from('families').upsert({
                         family_id: familyId,
-                        children: childrenMeta,
+                        children: children, // Including Base64 images
                         updated_at: new Date().toISOString()
                     }, { onConflict: 'family_id' });
                 } catch (e) {
