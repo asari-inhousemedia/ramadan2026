@@ -9,40 +9,84 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Outfit:wght@300;400;600;700;800&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=1.0.6">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
+    <script>
+        // Diese Funktion MUSS im Head stehen, damit sie sofort bereit ist
+        var isLoginMode = true;
+
+        function doToggle() {
+            // DEBUG: Damit wir sehen ob der Klick ankommt
+            console.log("Toggle-Funktion wurde aufgerufen");
+
+            isLoginMode = !isLoginMode;
+
+            var title = document.getElementById('pageTitle');
+            var sub = document.getElementById('pageSubtitle');
+            var btn = document.getElementById('submitBtn');
+            var q = document.getElementById('toggleQuestion');
+            var tLink = document.getElementById('toggleBtn');
+            var err = document.getElementById('errorMsg');
+
+            if (err) err.style.display = 'none';
+
+            if (isLoginMode) {
+                if (title) title.innerText = 'Anmelden';
+                if (sub) sub.innerText = 'Melde dich an, um den Kalender zu nutzen.';
+                if (btn) btn.innerText = 'Anmelden';
+                if (q) q.innerText = 'Noch kein Konto?';
+                if (tLink) tLink.innerText = 'Hier registrieren';
+            } else {
+                if (title) title.innerText = 'Registrieren';
+                if (sub) sub.innerText = 'Erstelle ein Konto für deine Familie.';
+                if (btn) btn.innerText = 'Konto erstellen';
+                if (q) q.innerText = 'Schon registriert?';
+                if (tLink) tLink.innerText = 'Hier anmelden';
+            }
+        }
+    </script>
+
     <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #0d1535;
+            font-family: 'Outfit', sans-serif;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
         .login-container {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            background: #0d1535;
+            position: relative;
+            z-index: 10;
         }
 
         .login-card {
-            background: rgba(13, 21, 53, 0.9);
+            background: rgba(13, 21, 53, 0.95);
             backdrop-filter: blur(20px);
-            border: 1px solid #d4a843;
+            border: 2px solid #d4a843;
             border-radius: 28px;
             padding: 40px 24px;
             width: 100%;
             max-width: 400px;
-            position: relative;
-            z-index: 1000;
-            /* Extrem hoch! */
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8);
+            text-align: center;
         }
 
-        .login-header h1 {
+        h1 {
             color: #d4a843;
             font-family: 'Amiri', serif;
             font-size: 2.2rem;
-            margin-bottom: 10px;
+            margin: 0 0 10px 0;
         }
 
-        .login-header p {
+        p {
             color: #a8afc8;
             margin-bottom: 30px;
             font-size: 0.95rem;
@@ -53,7 +97,7 @@
             text-align: left;
         }
 
-        .input-group label {
+        label {
             display: block;
             color: #f0d078;
             font-size: 0.85rem;
@@ -61,7 +105,7 @@
             font-weight: 600;
         }
 
-        .input-group input {
+        input {
             width: 100%;
             padding: 14px;
             border-radius: 12px;
@@ -69,6 +113,7 @@
             background: rgba(255, 255, 255, 0.05);
             color: #fff;
             font-size: 1rem;
+            box-sizing: border-box;
         }
 
         .auth-btn {
@@ -81,6 +126,11 @@
             font-weight: 800;
             font-size: 1.1rem;
             cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .auth-btn:active {
+            transform: scale(0.98);
         }
 
         .toggle-area {
@@ -111,6 +161,14 @@
             padding: 10px;
             border-radius: 10px;
         }
+
+        .ver-tag {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 10px;
+            opacity: 0.3;
+        }
     </style>
 </head>
 
@@ -118,22 +176,21 @@
 
     <div class="login-container">
         <div class="login-card">
-            <div style="font-size: 3rem; margin-bottom: 15px;">🌙</div>
+            <div style="font-size: 3rem; margin-bottom: 20px;">🌙</div>
 
-            <div class="login-header">
-                <h1 id="pageTitle">Anmelden</h1>
-                <p id="pageSubtitle">Melde dich an, um den Kalender zu nutzen.</p>
-            </div>
+            <h1 id="pageTitle">Anmelden</h1>
+            <p id="pageSubtitle">Melde dich an, um den Kalender zu nutzen.</p>
 
-            <form id="authForm" onsubmit="event.preventDefault(); window.handleAuth();">
+            <form id="authForm" onsubmit="event.preventDefault(); handleAuth();">
                 <div class="input-group">
                     <label>E-Mail Adresse</label>
-                    <input type="email" id="email" placeholder="name@beispiel.de" required>
+                    <input type="email" id="email" placeholder="name@beispiel.de" required autocomplete="email">
                 </div>
 
                 <div class="input-group">
                     <label>Passwort</label>
-                    <input type="password" id="password" placeholder="Mindestens 6 Zeichen" required minlength="6">
+                    <input type="password" id="password" placeholder="Mindestens 6 Zeichen" required minlength="6"
+                        autocomplete="current-password">
                 </div>
 
                 <button type="submit" class="auth-btn" id="submitBtn">Anmelden</button>
@@ -143,102 +200,69 @@
             <div class="toggle-area">
                 <p style="color: #a8afc8;">
                     <span id="toggleQuestion">Noch kein Konto?</span>
-                    <button type="button" class="toggle-link" id="toggleBtn" onclick="window.toggleMode();">Hier
+                    <button type="button" class="toggle-link" id="toggleBtn" onclick="doToggle()">Hier
                         registrieren</button>
                 </p>
             </div>
         </div>
     </div>
 
+    <div class="ver-tag">v1.0.7</div>
+
     <script>
-        // GLOBAL DEFINIEREN, damit onclick sie immer findet
-        window.isLoginMode = true;
-
-        window.toggleMode = function () {
-            window.isLoginMode = !window.isLoginMode;
-            console.log("Toggle geklickt. LoginMode ist jetzt:", window.isLoginMode);
-
-            const title = document.getElementById('pageTitle');
-            const sub = document.getElementById('pageSubtitle');
-            const btn = document.getElementById('submitBtn');
-            const q = document.getElementById('toggleQuestion');
-            const tLink = document.getElementById('toggleBtn');
-            const err = document.getElementById('errorMsg');
-
-            if (err) err.style.display = 'none';
-
-            if (window.isLoginMode) {
-                title.textContent = 'Anmelden';
-                sub.textContent = 'Melde dich an, um den Kalender zu nutzen.';
-                btn.textContent = 'Anmelden';
-                q.textContent = 'Noch kein Konto?';
-                tLink.textContent = 'Hier registrieren';
-            } else {
-                title.textContent = 'Registrieren';
-                sub.textContent = 'Erstelle ein Konto für deine Familie.';
-                btn.textContent = 'Konto erstellen';
-                q.textContent = 'Schon registriert?';
-                tLink.textContent = 'Hier anmelden';
-            }
-        };
-
-        // Supabase sicher laden
+        // Supabase Initialization
         let supabase;
         try {
             const SUPABASE_URL = 'https://thscbzyzblpqwbskymbg.supabase.co';
             const SUPABASE_KEY = 'sb_publishable_w4wZcJW_TOnzxlgr-kMr5Q_aCu8OxTz';
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        } catch (e) {
-            console.error("Supabase konnte nicht initialisiert werden:", e);
-        }
+        } catch (e) { console.error("Supabase Error:", e); }
 
-        window.handleAuth = async function () {
-            if (!supabase) {
-                alert("Verbindung zum Server fehlgeschlagen. Bitte Seite neu laden.");
-                return;
-            }
+        async function handleAuth() {
+            if (!supabase) { alert("Verbindung fehlgeschlagen. Bitte Seite neu laden."); return; }
 
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const btn = document.getElementById('submitBtn');
+            var email = document.getElementById('email').value;
+            var password = document.getElementById('password').value;
+            var btn = document.getElementById('submitBtn');
+            var errBox = document.getElementById('errorMsg');
 
             btn.disabled = true;
-            btn.textContent = 'Bitte warten...';
+            btn.innerText = 'Bitte warten...';
+            if (errBox) errBox.style.display = 'none';
 
             try {
                 let result;
-                if (window.isLoginMode) {
-                    result = await supabase.auth.signInWithPassword({ email, password });
+                if (isLoginMode) {
+                    result = await supabase.auth.signInWithPassword({ email: email, password: password });
                 } else {
-                    result = await supabase.auth.signUp({ email, password });
+                    result = await supabase.auth.signUp({ email: email, password: password });
                 }
 
                 if (result.error) throw result.error;
 
                 if (result.data.session) {
                     window.location.href = 'index.html';
-                } else {
-                    // Fallback für SignUp ohne direkte Session
-                    if (!window.isLoginMode) {
-                        const retry = await supabase.auth.signInWithPassword({ email, password });
-                        if (retry.data.session) {
-                            window.location.href = 'index.html';
-                        } else {
-                            document.getElementById('errorMsg').style.display = 'block';
-                            document.getElementById('errorMsg').textContent = "Konto erstellt! Bitte melde dich jetzt an.";
-                            window.toggleMode();
-                        }
+                } else if (!isLoginMode) {
+                    // Automatischer Login nach Registration
+                    const retry = await supabase.auth.signInWithPassword({ email: email, password: password });
+                    if (retry.data.session) {
+                        window.location.href = 'index.html';
+                    } else {
+                        errBox.innerText = "Konto erstellt! Bitte melde dich jetzt an.";
+                        errBox.style.display = 'block';
+                        doToggle();
                     }
                 }
             } catch (error) {
-                const errBox = document.getElementById('errorMsg');
-                errBox.textContent = error.message;
-                errBox.style.display = 'block';
+                if (errBox) {
+                    errBox.innerText = error.message;
+                    errBox.style.display = 'block';
+                }
             } finally {
                 btn.disabled = false;
-                btn.textContent = window.isLoginMode ? 'Anmelden' : 'Konto erstellen';
+                btn.innerText = isLoginMode ? 'Anmelden' : 'Konto erstellen';
             }
-        };
+        }
     </script>
 </body>
 
