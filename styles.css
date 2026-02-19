@@ -369,7 +369,7 @@ a:hover {
 }
 
 .child-tab {
-    padding: 8px 18px;
+    padding: 8px 16px;
     border: 2px solid rgba(180, 200, 255, 0.22);
     background: var(--bg-accent);
     color: var(--text-primary);
@@ -381,7 +381,9 @@ a:hover {
     transition: all var(--transition-fast);
     display: flex;
     align-items: center;
-    gap: 5px;
+    justify-content: center;
+    gap: 8px;
+    min-width: 100px;
 }
 
 .child-tab:hover,
@@ -390,6 +392,21 @@ a:hover {
     color: var(--bg-deep);
     border-color: var(--gold-primary);
     box-shadow: var(--shadow-gold);
+}
+
+.tab-star {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    pointer-events: none;
+}
+
+.child-tab.active .tab-star {
+    background: rgba(0, 0, 0, 0.1);
 }
 
 /* ========== MOSAIC COUNTER ========== */

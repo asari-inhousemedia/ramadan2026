@@ -59,6 +59,7 @@ let revealedTiles = [];
 let tileMapping = []; // tileMapping[doorIndex] = tileIndex (random shuffle)
 let currentChild = null;
 let childrenData = [];
+let allProgressData = []; // Cache for all children's scores
 let familyId = null;
 
 // ========== UTILS ==========
@@ -307,8 +308,20 @@ async function loadFamilyData() {
     if (currentChild) {
         await loadChildProgress(currentChild.name);
         loadChildImage(currentChild);
-        renderChildTabs();
     }
+
+    // Fetch progress for ALL children (to show stars in tabs)
+    if (supabaseClient && familyId) {
+        try {
+            const { data: progData } = await supabaseClient
+                .from('progress')
+                .select('child_name, completed_days')
+                .eq('family_id', familyId);
+            if (progData) allProgressData = progData;
+        } catch (e) { }
+    }
+
+    renderChildTabs();
 }
 
 function loadFromLocalStorage() {
@@ -316,8 +329,18 @@ function loadFromLocalStorage() {
     if (stored) {
         try {
             childrenData = JSON.parse(stored) || [];
+
+            // Also load star counts for all children from local storage
+            allProgressData = childrenData.map(child => {
+                const safeName = sanitize(child.name);
+                const key = `ramadan_completed_${safeName}`;
+                const completed = JSON.parse(localStorage.getItem(key) || '[]');
+                return { child_name: safeName, completed_days: completed };
+            });
+
         } catch (e) {
             childrenData = [];
+            allProgressData = [];
         }
     }
 }
@@ -339,8 +362,13 @@ function renderChildTabs() {
     childrenData.forEach((child) => {
         const tab = document.createElement('button');
         tab.className = 'child-tab';
-        tab.textContent = sanitize(child.name);
-        tab.setAttribute('aria-label', `Kind ${sanitize(child.name)} auswählen`);
+
+        // Find star count for this child
+        const childProg = allProgressData.find(p => p.child_name === child.name);
+        const starCount = childProg ? (childProg.completed_days || []).length : 0;
+
+        tab.innerHTML = `<span>${sanitize(child.name)}</span> <span class="tab-star">⭐ ${starCount}</span>`;
+        tab.setAttribute('aria-label', `${sanitize(child.name)}: ${starCount} Sterne gesammelt`);
 
         if (currentChild && child.name === currentChild.name) {
             tab.classList.add('active');
@@ -399,6 +427,14 @@ async function loadChildProgress(childName) {
             if (!error && data) {
                 completedDays = data.completed_days || [];
                 revealedTiles = data.revealed_tiles || [];
+
+                // Sync with local cache for tabs
+                const idx = allProgressData.findIndex(p => p.child_name === safeName);
+                if (idx !== -1) {
+                    allProgressData[idx].completed_days = completedDays;
+                } else {
+                    allProgressData.push({ child_name: safeName, completed_days: completedDays });
+                }
                 return;
             }
         } catch (e) { }
@@ -618,6 +654,9 @@ async function markDayCompleted(dayNum) {
 
     // Save progress
     await saveProgress();
+
+    // Update Tabs (to show new star count)
+    renderChildTabs();
 
     // Day 30 celebration
     if (dayNum === 30 && revealedTiles.length >= 30) {
