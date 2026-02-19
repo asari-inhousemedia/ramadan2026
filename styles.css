@@ -1856,3 +1856,29 @@ a:hover {
 .setup-btn-small {
     display: none !important;
 }
+
+/* ========== DONATION CARD HIGHLIGHT (User Request) ========== */
+@keyframes whiteBorderPulse {
+    0% {
+        border-color: rgba(255, 255, 255, 0.15);
+        box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+    }
+
+    50% {
+        border-color: rgba(255, 255, 255, 0.9);
+        /* Hellweiß */
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.35);
+        /* Starker Glow */
+    }
+
+    100% {
+        border-color: rgba(255, 255, 255, 0.15);
+        box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+    }
+}
+
+.donation-card.compact {
+    animation: whiteBorderPulse 3s infinite ease-in-out;
+    border-width: 1.5px !important;
+    border-style: solid;
+}
