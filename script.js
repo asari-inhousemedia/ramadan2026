@@ -6,7 +6,7 @@
 // ========== SUPABASE CONFIG ==========
 const SUPABASE_URL = 'https://thscbzyzblpqwbskymbg.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_w4wZcJW_TOnzxlgr-kMr5Q_aCu8OxTz';
-const APP_VERSION = '1.1.6';
+const APP_VERSION = '1.1.7';
 
 let supabaseClient = null;
 try {
@@ -837,15 +837,28 @@ async function loadChildProgress(childName) {
                 .single();
 
             if (!error && data) {
-                completedTasks = data.completed_tasks || []; // Updated property
-                revealedTiles = data.revealed_tiles || [];
+                completedTasks = data.completed_tasks || [];
 
-                // Sync with local cache for tabs
+                // CRITICAL: Re-derive revealedTiles from completedTasks to ensure 
+                // they follow the random tileMapping based on family seed.
+                // This fixes existing sequential progress without breaking data.
+                revealedTiles = [];
+                completedTasks.forEach(taskId => {
+                    const tIdx = dailyTasks.findIndex(t => t.id === taskId);
+                    if (tIdx !== -1) {
+                        const tileIdx = tileMapping[tIdx];
+                        if (tileIdx !== undefined && !revealedTiles.includes(tileIdx)) {
+                            revealedTiles.push(tileIdx);
+                        }
+                    }
+                });
+
+                // Sync with local cache for tabs...
                 const idx = allProgressData.findIndex(p => p.child_name === safeName);
                 if (idx !== -1) {
-                    allProgressData[idx].completed_tasks = completedTasks; // Updated property
+                    allProgressData[idx].completed_tasks = completedTasks;
                 } else {
-                    allProgressData.push({ child_name: safeName, completed_tasks: completedTasks }); // Updated property
+                    allProgressData.push({ child_name: safeName, completed_tasks: completedTasks });
                 }
                 return;
             }
@@ -1120,8 +1133,11 @@ async function markTaskCompleted(taskId, dayNum) {
     // Reveal a unique tile for EVERY task
     // Find the global index of this task in the 90 tasks list
     const taskIndex = dailyTasks.findIndex(t => t.id === taskId);
-    if (taskIndex !== -1 && !revealedTiles.includes(taskIndex)) {
-        revealRandomTile(taskIndex);
+    if (taskIndex !== -1) {
+        const tileIdx = tileMapping[taskIndex];
+        if (!revealedTiles.includes(tileIdx)) {
+            revealRandomTile(taskIndex);
+        }
     }
 
     // Check if the daily door should show a star (if at least one task is done)
