@@ -66,7 +66,8 @@
                 ">
                     🚪 Abmelden
                 </button>
-                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px; opacity: 0.7;">
+                <p id="userEmailInfo"
+                    style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px; opacity: 0.7;">
                     Du bist aktuell eingeloggt.
                 </p>
             </div>
@@ -123,6 +124,11 @@
                 return;
             }
             familyId = session.user.id;
+            const userEmail = session.user.email;
+            const emailInfo = document.getElementById('userEmailInfo');
+            if (emailInfo && userEmail) {
+                emailInfo.textContent = `Registriert mit: ${userEmail}`;
+            }
             console.log('[Auth] Logged in as:', familyId);
 
             loadData();
