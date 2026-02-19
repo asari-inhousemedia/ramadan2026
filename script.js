@@ -99,8 +99,8 @@ const I18N = {
         celebration_title: 'Bayram Mübarek!',
         celebration_text: 'Du hast alle 30 Tage geschafft! Dein Geschenk wartet auf dich! 🎁',
         celebration_btn: 'Geschenk enthüllen! 🌟',
-        footer_setup: '⚙️ Einstellungen',
-        footer_legal: '📜 Rechtliches',
+        footer_setup: 'Einstellungen',
+        footer_legal: 'Rechtliches',
         footer_copy: '© 2026 Inhouse Media · Mit 💛 gemacht',
         // Parents Page
         back_to_calendar: '← Zurück zum Kalender',
@@ -213,8 +213,8 @@ const I18N = {
         celebration_title: 'Bayramınız Mübarek Olsun!',
         celebration_text: '30 günün hepsini tamamladın! Hediyen seni bekliyor! 🎁',
         celebration_btn: 'Hediyeyi aç! 🌟',
-        footer_setup: '⚙️ Ayarlar',
-        footer_legal: '📜 Yasal Bilgiler',
+        footer_setup: 'Ayarlar',
+        footer_legal: 'Yasal Bilgiler',
         footer_copy: '© 2026 Inhouse Media · 💛 ile yapıldı',
         // Parents Page
         back_to_calendar: '← Takvime geri dön',
@@ -944,14 +944,13 @@ function buildCalendarGrid() {
             isLocked = true;
         }
 
-        // Ein Tag gilt als "fertig" fürs Kalenderblatt, wenn mindestens eine Aufgabe gemacht wurde
-        // Check if any task for this day is completed
-        const tasksForThisDay = dailyTasks.filter(task => task.day === i);
-        const anyTaskCompletedForDay = tasksForThisDay.some(task => completedTasks.includes(task.id));
+        const completedForThisDay = tasksForThisDay.filter(task => completedTasks.includes(task.id));
 
-        if (anyTaskCompletedForDay && !isLocked) {
+        if (completedForThisDay.length > 0 && !isLocked) {
             day.classList.add('completed');
-            day.innerHTML = `<span class="star-icon">⭐</span><span class="day-num">${i}</span>`;
+            let stars = '';
+            for (let s = 0; s < completedForThisDay.length; s++) stars += '⭐';
+            day.innerHTML = `<span class="star-icon">${stars}</span><span class="day-num">${i}</span>`;
         }
 
         if (isLocked) {
