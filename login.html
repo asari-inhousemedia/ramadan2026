@@ -11,6 +11,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="styles.css?v=1.0.9">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="script.js?v=1.1.5"></script>
 
     <!-- Meta & Branding -->
     <meta property="og:title" content="Anmelden | Ramadan Kalender 2026">
@@ -263,21 +264,27 @@
 </head>
 
 <body>
+    <div class="lang-switch-container" style="position: absolute; top: 20px; right: 20px; z-index: 100;">
+        <div class="lang-switch" id="langSwitch">
+            <button class="lang-btn active" data-lang="de">DE</button>
+            <button class="lang-btn" data-lang="tr">TR</button>
+        </div>
+    </div>
 
     <div class="login-container">
         <div class="login-card">
             <div style="font-size: 3rem; margin-bottom: 20px;">🌙</div>
-            <h1 id="pageTitle">Anmelden</h1>
-            <p id="pageSubtitle">Melde dich an, um den Kalender zu nutzen.</p>
+            <h1 id="pageTitle" data-i18n="login_title">Anmelden</h1>
+            <p id="pageSubtitle" data-i18n="login_subtitle">Melde dich an, um den Kalender zu nutzen.</p>
 
             <form id="authForm" onsubmit="event.preventDefault(); window.handleAuth();">
                 <div class="input-group">
-                    <label>E-Mail Adresse</label>
+                    <label data-i18n="email_label">E-Mail Adresse</label>
                     <input type="email" id="email" placeholder="name@beispiel.de" required>
                 </div>
 
                 <div class="input-group" id="passwordGroup">
-                    <label>Passwort</label>
+                    <label data-i18n="password_label">Passwort</label>
                     <div class="password-wrapper">
                         <input type="password" id="password" placeholder="Mindestens 6 Zeichen" minlength="6">
                         <button type="button" class="password-toggle" onclick="togglePassword('password', this)"
@@ -286,7 +293,7 @@
                 </div>
 
                 <div class="input-group" id="confirmPasswordGroup" style="display: none;">
-                    <label>Passwort wiederholen</label>
+                    <label data-i18n="confirm_password_label">Passwort wiederholen</label>
                     <div class="password-wrapper">
                         <input type="password" id="confirmPassword" placeholder="Passwort bestätigen">
                         <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword', this)"
@@ -296,27 +303,29 @@
 
                 <div id="forgotPwArea" style="text-align: right; margin-top: -10px; margin-bottom: 20px;">
                     <button type="button" class="toggle-link" style="font-size: 0.8rem; opacity: 0.8;"
-                        onclick="window.showResetMode()">Passwort vergessen?</button>
+                        onclick="window.showResetMode()" data-i18n="forgot_password_link">Passwort vergessen?</button>
                 </div>
 
                 <!-- Datenschutz Checkbox (nur bei Registrierung) -->
                 <div id="privacyArea" class="privacy-group">
                     <input type="checkbox" id="privacyCheck">
                     <label for="privacyCheck" class="privacy-text"
-                        style="color: inherit; font-weight: normal; margin: 0; cursor: pointer;">
+                        style="color: inherit; font-weight: normal; margin: 0; cursor: pointer;"
+                        data-i18n="privacy_agree_text">
                         Ich bin mit der <a href="rechtliches.html" target="_blank">Datenschutzerklärung</a>
                         einverstanden.
                     </label>
                 </div>
 
-                <button type="submit" class="auth-btn" id="submitBtn">Anmelden</button>
+                <button type="submit" class="auth-btn" id="submitBtn" data-i18n="login_btn">Anmelden</button>
                 <div id="errorMsg" class="error-msg"></div>
             </form>
 
             <div class="toggle-area">
                 <p style="color: #a8afc8;">
-                    <span id="toggleQuestion">Noch kein Konto?</span>
-                    <button type="button" class="toggle-link" id="toggleBtn" onclick="doToggle()">Hier
+                    <span id="toggleQuestion" data-i18n="no_account_question">Noch kein Konto?</span>
+                    <button type="button" class="toggle-link" id="toggleBtn" onclick="doToggle()"
+                        data-i18n="register_link">Hier
                         registrieren</button>
                 </p>
             </div>
@@ -326,21 +335,27 @@
     <!-- Footer -->
     <footer class="footer">
         <nav class="footer-nav">
-            <a href="rechtliches.html">📜 Rechtliches & Datenschutz</a>
+            <a href="rechtliches.html" data-i18n="footer_legal">📜 Rechtliches & Datenschutz</a>
         </nav>
-        <p class="footer-copy">© 2026 Inhouse Media · Mit 💛 gemacht</p>
+        <p class="footer-copy" data-i18n="footer_copy">© 2026 Inhouse Media · Mit 💛 gemacht</p>
     </footer>
 
     <div class="ver-tag">v1.1.2</div>
 
     <script>
+        // Initialize when DOM ready
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof setupLanguageSwitcher === 'function') setupLanguageSwitcher();
+            if (typeof updateUI === 'function') updateUI();
+        });
+
         // Supabase Initialization
         (function () {
             try {
                 const URL = 'https://thscbzyzblpqwbskymbg.supabase.co';
                 const KEY = 'sb_publishable_w4wZcJW_TOnzxlgr-kMr5Q_aCu8OxTz';
                 window.sb = window.supabase.createClient(URL, KEY);
-                console.log("Supabase bereit (v1.1.2)");
+                console.log("Supabase bereit (v1.1.4)");
             } catch (e) { console.error("Supabase Error:", e); }
         })();
 
@@ -352,25 +367,42 @@
             if (el.type === 'password') {
                 el.type = 'text';
                 btn.textContent = '🙈';
-                btn.setAttribute('aria-label', 'Passwort verbergen');
+                btn.setAttribute('aria-label', t('password_hide_label', { defaultValue: 'Verbergen' }));
             } else {
                 el.type = 'password';
                 btn.textContent = '👁️';
-                btn.setAttribute('aria-label', 'Passwort zeigen');
+                btn.setAttribute('aria-label', t('password_show_label', { defaultValue: 'Zeigen' }));
             }
         }
 
         function showResetMode() {
             window.isResetMode = true;
-            document.getElementById('pageTitle').innerText = 'Passwort vergessen';
-            document.getElementById('pageSubtitle').innerText = 'Gib deine E-Mail ein, um einen Reset-Link zu erhalten.';
-            document.getElementById('submitBtn').innerText = 'Reset-Link senden';
+
+            const title = document.getElementById('pageTitle');
+            const sub = document.getElementById('pageSubtitle');
+            const btn = document.getElementById('submitBtn');
+            const q = document.getElementById('toggleQuestion');
+            const tLink = document.getElementById('toggleBtn');
+
+            title.innerText = t('reset_title');
+            title.dataset.i18n = 'reset_title';
+
+            sub.innerText = t('reset_subtitle');
+            sub.dataset.i18n = 'reset_subtitle';
+
+            btn.innerText = t('reset_btn');
+            btn.dataset.i18n = 'reset_btn';
+
+            q.innerText = t('reset_back_question');
+            q.dataset.i18n = 'reset_back_question';
+
+            tLink.innerText = t('reset_back_link');
+            tLink.dataset.i18n = 'reset_back_link';
+
             document.getElementById('passwordGroup').style.display = 'none';
             document.getElementById('confirmPasswordGroup').style.display = 'none';
             document.getElementById('forgotPwArea').style.display = 'none';
             document.getElementById('privacyArea').style.display = 'none';
-            document.getElementById('toggleQuestion').innerText = 'Wieder eingefallen?';
-            document.getElementById('toggleBtn').innerText = 'Zum Login';
         }
 
         function doToggle() {
@@ -394,20 +426,40 @@
             pw.style.display = 'block';
 
             if (window.isLoginMode) {
-                title.innerText = 'Anmelden';
-                sub.innerText = 'Melde dich an, um den Kalender zu nutzen.';
-                btn.innerText = 'Anmelden';
-                q.innerText = 'Noch kein Konto?';
-                tLink.innerText = 'Hier registrieren';
+                title.innerText = t('login_title');
+                title.dataset.i18n = 'login_title';
+
+                sub.innerText = t('login_subtitle');
+                sub.dataset.i18n = 'login_subtitle';
+
+                btn.innerText = t('login_btn');
+                btn.dataset.i18n = 'login_btn';
+
+                q.innerText = t('no_account_question');
+                q.dataset.i18n = 'no_account_question';
+
+                tLink.innerText = t('register_link');
+                tLink.dataset.i18n = 'register_link';
+
                 priv.style.display = 'none';
                 forgot.style.display = 'block';
                 pwConf.style.display = 'none';
             } else {
-                title.innerText = 'Registrieren';
-                sub.innerText = 'Erstelle ein Konto für deine Familie.';
-                btn.innerText = 'Konto erstellen';
-                q.innerText = 'Bereit ein Konto?';
-                tLink.innerText = 'Hier anmelden';
+                title.innerText = t('register_title');
+                title.dataset.i18n = 'register_title';
+
+                sub.innerText = t('register_subtitle');
+                sub.dataset.i18n = 'register_subtitle';
+
+                btn.innerText = t('register_btn');
+                btn.dataset.i18n = 'register_btn';
+
+                q.innerText = t('have_account_question');
+                q.dataset.i18n = 'have_account_question';
+
+                tLink.innerText = t('login_link');
+                tLink.dataset.i18n = 'login_link';
+
                 priv.style.display = 'flex';
                 forgot.style.display = 'none';
                 pwConf.style.display = 'block';
@@ -416,7 +468,12 @@
 
         async function handleAuth() {
             console.log("Auth gestartet...");
-            if (!window.sb) { alert("Serververbindung fehlt."); return; }
+            const client = window.supabaseClient;
+            if (!client) {
+                console.error("Supabase client not ready");
+                alert("Serververbindung fehlt.");
+                return;
+            }
 
             var email = document.getElementById('email').value;
             var password = document.getElementById('password').value;
@@ -425,7 +482,7 @@
             var errBox = document.getElementById('errorMsg');
 
             btn.disabled = true;
-            btn.innerText = 'Bitte warten...';
+            btn.innerText = t('wait_text');
             if (errBox) {
                 errBox.style.display = 'none';
                 errBox.style.background = 'rgba(255, 60, 60, 0.1)';
@@ -434,11 +491,11 @@
 
             try {
                 if (window.isResetMode) {
-                    const { error } = await window.sb.auth.resetPasswordForEmail(email, {
+                    const { error } = await client.auth.resetPasswordForEmail(email, {
                         redirectTo: window.location.origin + '/reset-password.html',
                     });
                     if (error) throw error;
-                    errBox.innerText = "Checke deine E-Mails! Wir haben dir einen Link geschickt.";
+                    errBox.innerText = t('reset_success');
                     errBox.style.background = 'rgba(60, 255, 60, 0.1)';
                     errBox.style.color = '#6bff6b';
                     errBox.style.display = 'block';
@@ -450,14 +507,14 @@
                     // Check Privacy
                     const checked = document.getElementById('privacyCheck').checked;
                     if (!checked) {
-                        errBox.innerText = "Bitte akzeptiere die Datenschutzerklärung.";
+                        errBox.innerText = t('privacy_error');
                         errBox.style.display = 'block';
                         return;
                     }
 
                     // Check Password Match
                     if (password !== confirmPassword) {
-                        errBox.innerText = "Die Passwörter stimmen nicht überein.";
+                        errBox.innerText = t('password_mismatch');
                         errBox.style.display = 'block';
                         return;
                     }
@@ -465,9 +522,9 @@
 
                 let result;
                 if (window.isLoginMode) {
-                    result = await window.sb.auth.signInWithPassword({ email, password });
+                    result = await client.auth.signInWithPassword({ email, password });
                 } else {
-                    result = await window.sb.auth.signUp({ email, password });
+                    result = await client.auth.signUp({ email, password });
                 }
 
                 if (result.error) throw result.error;
@@ -476,11 +533,11 @@
                     window.location.href = 'index.html';
                 } else if (!window.isLoginMode) {
                     // Automatischer Login-Versuch
-                    const retry = await window.sb.auth.signInWithPassword({ email, password });
+                    const retry = await client.auth.signInWithPassword({ email, password });
                     if (retry.data && retry.data.session) {
                         window.location.href = 'index.html';
                     } else {
-                        errBox.innerText = "Konto erstellt! Bitte melde dich jetzt an.";
+                        errBox.innerText = t('account_created');
                         errBox.style.display = 'block';
                         window.isLoginMode = false;
                         window.doToggle();
@@ -494,8 +551,8 @@
                 }
             } finally {
                 btn.disabled = false;
-                if (window.isResetMode) btn.innerText = 'Reset-Link senden';
-                else btn.innerText = window.isLoginMode ? 'Anmelden' : 'Konto erstellen';
+                if (window.isResetMode) btn.innerText = t('reset_btn');
+                else btn.innerText = window.isLoginMode ? t('login_btn') : t('register_btn');
             }
         }
     </script>

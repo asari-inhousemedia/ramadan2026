@@ -19,8 +19,18 @@
 </head>
 
 <body>
+    <div class="header">
+        <div class="header-inner">
+            <div class="header-actions" style="justify-content: flex-end; width: 100%;">
+                <div class="lang-switch" id="langSwitch">
+                    <button class="lang-btn active" data-lang="de">DE</button>
+                    <button class="lang-btn" data-lang="tr">TR</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="setup-page">
-        <a href="index.html" class="setup-back" id="backLink">← Zurück zum Kalender</a>
+        <a href="index.html" class="setup-back" id="backLink" data-i18n="back_to_calendar">← Zurück zum Kalender</a>
 
         <div class="setup-intro-card" style="
             background: rgba(13, 21, 53, 0.5);
@@ -30,25 +40,27 @@
             margin-bottom: 24px;
             text-align: left;
         ">
-            <h3
+            <h3 data-i18n="setup_how_it_works"
                 style="margin-top:0; color:var(--gold-primary); font-family:var(--font-display); font-size:1.1rem; display:flex; align-items:center; gap:8px;">
                 ✨ So funktioniert's
             </h3>
             <p style="margin-bottom: 12px; line-height: 1.5; font-size: 0.9rem; color: var(--text-secondary);">
-                1. <strong>Kind anlegen</strong> (nur Vorname)<br>
-                2. <strong>Foto vom echten Bayram-Geschenk</strong> hochladen 🎁<br>
-                <span style="display:block; margin-left:14px; font-size:0.8rem; opacity:0.85; margin-bottom:4px;">
+                <span data-i18n="setup_step1">1. <strong>Kind anlegen</strong> (nur Vorname)</span><br>
+                <span data-i18n="setup_step2">2. <strong>Foto vom echten Bayram-Geschenk</strong> hochladen
+                    🎁</span><br>
+                <span style="display:block; margin-left:14px; font-size:0.8rem; opacity:0.85; margin-bottom:4px;"
+                    data-i18n="setup_hint">
                     Tipp: Mach ein Foto von dem Geschenk, das dein Kind am Festtag auch wirklich bekommt. So steigt die
                     Vorfreude jeden Tag!
                 </span>
-                3. Jeden Tag öffnet sich ein Teil – an Bayram ist es komplett!
+                <span data-i18n="setup_step3">3. Jeden Tag öffnet sich ein Teil – an Bayram ist es komplett!</span>
             </p>
         </div>
 
         <!-- Children Section -->
         <div class="children-section">
-            <h2>👧🧒 Kinder hinzufügen</h2>
-            <p class="children-count" id="childrenCount">0 / 5 Kinder angelegt</p>
+            <h2 data-i18n="setup_add_children">👧🧒 Kinder hinzufügen</h2>
+            <p class="children-count" id="childrenCount" data-i18n="setup_count">0 / 5 Kinder angelegt</p>
 
             <!-- Logout Section -->
             <div style="text-align:center; margin-bottom: 24px;">
@@ -64,27 +76,28 @@
                     align-items: center;
                     gap: 6px;
                 ">
-                    🚪 Abmelden
+                    🚪 <span data-i18n="nav_logout">Abmelden</span>
                 </button>
-                <p id="userEmailInfo"
+                <p id="userEmailInfo" data-i18n="setup_logged_in"
                     style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px; opacity: 0.7;">
                     Du bist aktuell eingeloggt.
                 </p>
             </div>
 
-            <p style="text-align:center; color: var(--text-secondary); font-size: 0.84rem; margin-bottom: 18px;">
+            <p style="text-align:center; color: var(--text-secondary); font-size: 0.84rem; margin-bottom: 18px;"
+                data-i18n="setup_info_text">
                 Nur <strong style="color:var(--gold-light)">Vorname</strong> eingeben – kein Nachname oder andere
                 persönliche Daten.
                 Lade ein Bild hoch, das dein Kind am <strong style="color:var(--gold-light)">30. Tag (Bayram)</strong>
                 als Geschenk bekommt. 🎁
             </p>
             <div id="childrenList"></div>
-            <button class="btn-add-child" id="addChildBtn" type="button">
+            <button class="btn-add-child" id="addChildBtn" type="button" data-i18n="setup_add_btn">
                 ➕ Kind hinzufügen
             </button>
         </div>
 
-        <button class="btn-save" id="saveBtn" type="button">
+        <button class="btn-save" id="saveBtn" type="button" data-i18n="setup_save_btn">
             💾 Speichern & Zurück
         </button>
     </div>
@@ -94,64 +107,60 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        // Set configuration before loading script.js
+        window.MAX_CHILDREN = 3;
+        window.MAX_NAME_LENGTH = 30;
+    </script>
+    <script src="script.js?v=1.1.5"></script>
+    <script>
         /* ======================================
            SETUP PAGE LOGIC
            ====================================== */
 
-        const SUPABASE_URL = 'https://thscbzyzblpqwbskymbg.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_w4wZcJW_TOnzxlgr-kMr5Q_aCu8OxTz';
-        const MAX_CHILDREN = 3;
-        const MAX_NAME_LENGTH = 30;
-
-        let supabaseClient = null;
-        try {
-            if (window.supabase && window.supabase.createClient) {
-                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            }
-        } catch (e) { }
-
+        // Use global variables from script.js (window.supabaseClient)
         let children = [];
-        let familyId = null;
         let childCount = 0;
 
         // AUTH CHECK & INIT
         async function init() {
-            if (!supabaseClient) return;
+            const client = window.supabaseClient;
+            if (!client) {
+                console.warn('[Setup] supabaseClient not ready, retrying...');
+                setTimeout(init, 500);
+                return;
+            }
 
-            const { data: { session }, error } = await supabaseClient.auth.getSession();
+            const { data: { session }, error } = await client.auth.getSession();
             if (error || !session) {
+                console.log('[Auth] No session, redirecting to login');
                 window.location.href = 'login.html';
                 return;
             }
-            familyId = session.user.id;
+            window.familyId = session.user.id;
             const userEmail = session.user.email;
             const emailInfo = document.getElementById('userEmailInfo');
             if (emailInfo && userEmail) {
-                emailInfo.textContent = `Registriert mit: ${userEmail}`;
+                emailInfo.textContent = t('setup_registered', { email: userEmail });
             }
-            console.log('[Auth] Logged in as:', familyId);
+            console.log('[Setup] Init successful for:', window.familyId);
 
-            loadData();
+            await loadData();
+            if (typeof updateUI === 'function') updateUI();
         }
 
-        init();
+        // init(); // Removed from global scope
 
-        // ========== SANITIZE ==========
-        function sanitize(str) {
-            if (typeof str !== 'string') return '';
-            return str
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#x27;')
-                .trim()
-                .slice(0, MAX_NAME_LENGTH);
-        }
+        // sanitize function is provided by script.js
 
         // ========== INIT EVENT LISTENERS ==========
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('addChildBtn').addEventListener('click', () => addChild());
+        document.addEventListener('DOMContentLoaded', async () => {
+            await init(); // Wait for init and loadData
+            if (typeof updateUI === 'function') updateUI(); // Re-translate after dynamic load
+
+            document.getElementById('addChildBtn').addEventListener('click', () => {
+                addChild();
+                if (typeof updateUI === 'function') updateUI();
+            });
             document.getElementById('saveBtn').addEventListener('click', saveData);
 
             const logout = document.getElementById('logoutBtn');
@@ -162,19 +171,21 @@
 
         async function handleLogout() {
             if (confirm('Möchtest du dich wirklich abmelden?')) {
-                await supabaseClient.auth.signOut();
+                const client = window.supabaseClient;
+                if (client) await client.auth.signOut();
                 window.location.href = 'login.html';
             }
         }
 
         // ========== COPY LINK ==========
         function copyFamilyLink() {
-            if (!familyId) {
+            const fId = window.familyId;
+            if (!fId) {
                 showToast('Erst speichern, dann Link kopieren!', true);
                 return;
             }
 
-            const url = `${window.location.origin}${window.location.pathname.replace('setup.html', 'index.html')}?family=${familyId}`;
+            const url = `${window.location.origin}${window.location.pathname.replace('setup.html', 'index.html')}?family=${fId}`;
 
             navigator.clipboard.writeText(url).then(() => {
                 showToast('🔗 Link kopiert!');
@@ -185,16 +196,20 @@
 
         // ========== LOAD DATA ==========
         async function loadData() {
+            const client = window.supabaseClient;
+            const fId = window.familyId;
+
             // 1. Try Supabase
-            if (supabaseClient && familyId) {
+            if (client && fId) {
                 try {
-                    const { data, error } = await supabaseClient
+                    const { data, error } = await client
                         .from('families')
                         .select('*')
-                        .eq('family_id', familyId)
+                        .eq('family_id', fId)
                         .single();
 
                     if (!error && data && data.children) {
+                        console.log('[Setup] Data loaded from Supabase');
                         const list = document.getElementById('childrenList');
                         list.innerHTML = '';
                         childCount = 0;
@@ -203,8 +218,10 @@
                             addChild(child.name, child.imageData);
                         });
                         return;
+                    } else if (error && error.code !== 'PGRST116') {
+                        console.error('[Setup] Supabase load error:', error);
                     }
-                } catch (e) { }
+                } catch (e) { console.error('[Setup] Exception in loadData:', e); }
             }
 
             // 2. Fallback to localStorage (Migration)
@@ -231,7 +248,7 @@
         function addChild(existingName, existingImage) {
             const currentCards = document.querySelectorAll('.child-card').length;
             if (currentCards >= MAX_CHILDREN) {
-                showToast(`Maximal ${MAX_CHILDREN} Kinder möglich!`, true);
+                showToast(t('setup_max_reached', { max: MAX_CHILDREN }), true);
                 return;
             }
 
@@ -247,13 +264,14 @@
 
             card.innerHTML = `
                 <div class="child-card-header">
-                    <span class="child-card-title">Kind ${idx}</span>
-                    <button class="child-remove-btn" type="button" aria-label="Kind ${idx} entfernen">✕</button>
+                    <span class="child-card-title" data-i18n="child_label" data-i18n-data='{"idx":${idx}}'>${t('child_label', { idx: idx })}</span>
+                    <button class="child-remove-btn" type="button" aria-label="${t('child_label', { idx: idx })} entfernen">✕</button>
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="childName${idx}">Vorname des Kindes</label>
+                    <label class="form-label" for="childName${idx}" data-i18n="child_name_label">${t('child_name_label')}</label>
                     <input type="text" class="form-input child-name-input" id="childName${idx}"
-                        placeholder="z.B. Elif, Yusuf, Leyla …"
+                        placeholder="${t('child_name_placeholder')}"
+                        data-i18n-placeholder="child_name_placeholder"
                         value="${safeName}"
                         maxlength="${MAX_NAME_LENGTH}"
                         autocomplete="off"
@@ -261,16 +279,16 @@
                         spellcheck="false">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Geschenk-Bild (wird hinter dem Mosaik versteckt)</label>
+                    <label class="form-label" data-i18n="child_img_label">${t('child_img_label')}</label>
                     <div class="file-upload" id="fileUpload${idx}">
                         <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onchange="handleImageUpload(event, ${idx})" aria-label="Bild hochladen">
                         <div class="file-upload-icon" id="uploadIcon${idx}">📷</div>
-                        <div class="file-upload-text" id="uploadText${idx}">Bild auswählen oder hierher ziehen</div>
+                        <div class="file-upload-text" id="uploadText${idx}" data-i18n="child_img_upload_text">${t('child_img_upload_text')}</div>
                         <img class="file-upload-preview" id="preview${idx}" alt="Vorschau">
                     </div>
                     <div class="file-upload-actions" id="fileActions${idx}">
-                        <button class="file-action-btn file-action-change" onclick="triggerFileInput(${idx})" type="button">🔄 Bild ändern</button>
-                        <button class="file-action-btn file-action-remove" onclick="removeImage(${idx})" type="button">🗑️ Entfernen</button>
+                        <button class="file-action-btn file-action-change" onclick="triggerFileInput(${idx})" type="button" data-i18n="child_img_change">${t('child_img_change')}</button>
+                        <button class="file-action-btn file-action-remove" onclick="removeImage(${idx})" type="button" data-i18n="child_img_remove">${t('child_img_remove')}</button>
                     </div>
                 </div>
             `;
@@ -328,7 +346,7 @@
             const cards = document.querySelectorAll('.child-card');
             cards.forEach((card, index) => {
                 const title = card.querySelector('.child-card-title');
-                if (title) title.textContent = `Kind ${index + 1}`;
+                if (title) title.textContent = t('child_label', { idx: index + 1 });
             });
             // Don't reset childCount global, just use it for unique IDs if needed,
             // but relabel the UI for the user.
@@ -443,7 +461,7 @@
         function updateChildrenCount() {
             const count = document.querySelectorAll('.child-card').length;
             const el = document.getElementById('childrenCount');
-            if (el) el.textContent = `${count} / ${MAX_CHILDREN} Kinder angelegt`;
+            if (el) el.textContent = t('setup_count', { count: count, max: MAX_CHILDREN });
         }
 
         function updateAddButton() {
@@ -452,8 +470,8 @@
             if (btn) {
                 btn.disabled = count >= MAX_CHILDREN;
                 btn.textContent = count >= MAX_CHILDREN
-                    ? `✅ Maximum erreicht (${MAX_CHILDREN} Kinder)`
-                    : '➕ Kind hinzufügen';
+                    ? t('setup_max_reached', { max: MAX_CHILDREN })
+                    : t('setup_add_btn');
             }
         }
 
@@ -467,6 +485,9 @@
 
         // ========== SAVE ==========
         async function saveData() {
+            const client = window.supabaseClient;
+            const fId = window.familyId;
+
             const cards = document.querySelectorAll('.child-card');
             const saveBtn = document.getElementById('saveBtn');
             const originalBtnText = saveBtn.textContent;
@@ -480,17 +501,17 @@
                 for (const card of cards) {
                     const nameInput = card.querySelector('.child-name-input');
                     const rawName = nameInput ? nameInput.value : '';
-                    const name = sanitize(rawName);
+                    const name = typeof sanitize === 'function' ? sanitize(rawName) : rawName.trim();
                     let imageData = card.dataset.imageData || '';
 
                     if (!name) continue;
 
                     // If it's a NEW image (Base64), upload it to Supabase Storage
                     if (imageData.startsWith('data:image')) {
-                        const fileName = `${familyId}/${Date.now()}_${name.toLowerCase().replace(/\s/g, '_')}.jpg`;
+                        const fileName = `${fId}/${Date.now()}_${name.toLowerCase().replace(/\s/g, '_')}.jpg`;
                         const blob = dataURLtoBlob(imageData);
 
-                        const { data: uploadData, error: uploadError } = await supabaseClient
+                        const { data: uploadData, error: uploadError } = await client
                             .storage
                             .from('child-images')
                             .upload(fileName, blob, {
@@ -504,7 +525,7 @@
                         }
 
                         // Get Public URL
-                        const { data: publicUrlData } = supabaseClient
+                        const { data: publicUrlData } = client
                             .storage
                             .from('child-images')
                             .getPublicUrl(fileName);
@@ -526,9 +547,9 @@
                 localStorage.setItem('ramadan_children', JSON.stringify(children));
 
                 // Save to Supabase (Secure Cloud Backup)
-                if (supabaseClient && familyId) {
-                    const { error: sbError } = await supabaseClient.from('families').upsert({
-                        family_id: familyId,
+                if (client && fId) {
+                    const { error: sbError } = await client.from('families').upsert({
+                        family_id: fId,
                         children: children, // Now contains URLs instead of Base64
                         updated_at: new Date().toISOString()
                     }, { onConflict: 'family_id' });

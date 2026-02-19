@@ -73,11 +73,15 @@
 
                 <!-- NEW Clean Setup Button -->
                 <div class="header-actions">
-                    <a href="setup.html" class="setup-hero-btn">
-                        <span class="setup-icon">⚙️</span> Konfigurieren
+                    <div class="lang-switch" id="langSwitch">
+                        <button class="lang-btn active" data-lang="de">DE</button>
+                        <button class="lang-btn" data-lang="tr">TR</button>
+                    </div>
+                    <a href="setup.html" class="setup-hero-btn" id="setupNavBtn">
+                        <span class="setup-icon">⚙️</span> <span data-i18n="nav_setup">Konfigurieren</span>
                     </a>
                     <button id="logoutBtn" class="logout-link-btn" title="Abmelden">
-                        🚪 Abmelden
+                        🚪 <span data-i18n="nav_logout">Abmelden</span>
                     </button>
                 </div>
             </div>
@@ -106,8 +110,8 @@
                     <img src="" alt="Geschenk-Bild" id="giftImage" style="display:none;">
                     <div class="mosaic-placeholder" id="mosaicPlaceholder">
                         <span>🎁</span>
-                        <p>Kein Bild hochgeladen</p>
-                        <a href="setup.html" class="placeholder-link">Jetzt einrichten →</a>
+                        <p data-i18n="mosaic_empty">Kein Bild hochgeladen</p>
+                        <a href="setup.html" class="placeholder-link" data-i18n="mosaic_link">Jetzt einrichten →</a>
                     </div>
                 </div>
                 <div class="mosaic-grid" id="mosaicGrid"></div>
@@ -123,21 +127,21 @@
             <div class="donation-card compact">
                 <div class="donation-header-compact">
                     <span class="donation-icon-small">💛</span>
-                    <h2 class="donation-title-small">Spendenaktion</h2>
+                    <h2 class="donation-title-small" data-i18n="donation_title">Spendenaktion</h2>
                 </div>
-                <p class="donation-text-small">
+                <p class="donation-text-small" data-i18n="donation_text">
                     Wir spenden alles an bedürftige Kinder – für ein freudiges Bayram für alle!
                 </p>
                 <div class="donation-actions">
                     <a href="https://www.paypal.com/pools/c/9mLJ38uQx8" class="donation-btn-small paypal"
                         target="_blank" style="flex-direction:column; gap:0px; padding:6px;">
-                        <span>💛 Spenden</span>
+                        <span>💛 <span data-i18n="donation_paypal">Spenden</span></span>
                         <span style="font-size:0.65rem; font-weight:400; opacity:0.9; line-height:1;">(PayPal
                             Moneypool)</span>
                     </a>
                     <a href="https://www.instagram.com/ahmetsari.ai" class="donation-btn-small instagram"
                         target="_blank" style="flex-direction:column; gap:0px; padding:6px;">
-                        <span>📸 Instagram</span>
+                        <span>📸 <span data-i18n="donation_insta">Instagram</span></span>
                         <span style="font-size:0.65rem; font-weight:400; opacity:0.9; line-height:1;">(Updates zur
                             Spende)</span>
                     </a>
@@ -157,15 +161,15 @@
             <a href="parents.html" class="info-nav-btn parents">
                 <span class="btn-icon">👨‍👩‍👧‍👦</span>
                 <div class="btn-text">
-                    <span class="btn-label">Für Eltern</span>
-                    <span class="btn-sub">Motivation & Tipps</span>
+                    <span class="btn-label" data-i18n="nav_parents">Für Eltern</span>
+                    <span class="btn-sub" data-i18n="nav_parents_sub">Motivation & Tipps</span>
                 </div>
             </a>
             <a href="children.html" class="info-nav-btn children">
                 <span class="btn-icon">👧🧒</span>
                 <div class="btn-text">
-                    <span class="btn-label">Für Kinder</span>
-                    <span class="btn-sub">Infos & Spaß</span>
+                    <span class="btn-label" data-i18n="nav_children">Für Kinder</span>
+                    <span class="btn-sub" data-i18n="nav_children_sub">Infos & Spaß</span>
                 </div>
             </a>
         </section>
@@ -173,7 +177,7 @@
         <!-- Loading State -->
         <div class="loading-overlay" id="loadingOverlay">
             <div class="loading-spinner"></div>
-            <p>Kalender wird geladen…</p>
+            <p data-i18n="loading">Kalender wird geladen…</p>
         </div>
 
     </main>
@@ -199,9 +203,11 @@
     <div class="celebration-overlay" id="celebrationOverlay" style="display:none;">
         <div class="celebration-content">
             <div class="celebration-emoji">🎉</div>
-            <h2 class="celebration-title">Bayram Mübarek!</h2>
-            <p class="celebration-text">Du hast alle 30 Tage geschafft! Dein Geschenk wartet auf dich! 🎁</p>
-            <button class="celebration-btn" id="celebrationClose">Geschenk enthüllen! 🌟</button>
+            <h2 class="celebration-title" data-i18n="celebration_title">Bayram Mübarek!</h2>
+            <p class="celebration-text" data-i18n="celebration_text">Du hast alle 30 Tage geschafft! Dein Geschenk
+                wartet auf dich! 🎁</p>
+            <button class="celebration-btn" id="celebrationClose" data-i18n="celebration_btn">Geschenk enthüllen!
+                🌟</button>
         </div>
         <div class="fireworks" id="fireworks"></div>
     </div>
@@ -209,15 +215,15 @@
     <!-- Footer -->
     <footer class="footer">
         <nav class="footer-nav">
-            <a href="setup.html" id="setupLink">⚙️ Einstellungen</a>
-            <a href="rechtliches.html" id="legalLink">📜 Rechtliches</a>
+            <a href="setup.html" id="setupLink">⚙️ <span data-i18n="footer_setup">Einstellungen</span></a>
+            <a href="rechtliches.html" id="legalLink">📜 <span data-i18n="footer_legal">Rechtliches</span></a>
         </nav>
-        <p class="footer-copy">© 2026 Inhouse Media · Mit 💛 gemacht</p>
+        <p class="footer-copy" data-i18n="footer_copy">© 2026 Inhouse Media · Mit 💛 gemacht</p>
     </footer>
 
     <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="script.js"></script>
+    <script src="script.js?v=1.1.5"></script>
 </body>
 
 </html>

@@ -133,35 +133,46 @@
 </head>
 
 <body>
+    <div class="header">
+        <div class="header-inner">
+            <div class="header-actions" style="justify-content: flex-end; width: 100%;">
+                <div class="lang-switch" id="langSwitch">
+                    <button class="lang-btn active" data-lang="de">DE</button>
+                    <button class="lang-btn" data-lang="tr">TR</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="setup-page" style="max-width: 800px; margin: 0 auto; padding: 20px;">
-        <a href="index.html" class="setup-back">← Zurück zum Kalender</a>
+        <a href="index.html" class="setup-back" data-i18n="back_to_calendar">← Zurück zum Kalender</a>
 
         <div class="info-card-custom">
-            <h1>Unsere Motivation</h1>
-            <div class="subtitle">Warum wir diesen digitalen Ramadan-Kalender ins Leben gerufen haben</div>
+            <h1 data-i18n="motivation_title">Unsere Motivation</h1>
+            <div class="subtitle" data-i18n="motivation_subtitle">Warum wir diesen digitalen Ramadan-Kalender ins Leben
+                gerufen haben</div>
 
-            <p>
+            <p data-i18n="motivation_p1">
                 Die Idee zu diesem Projekt ist ganz spontan entstanden – aus dem Wunsch heraus, unseren Kindern Ramadan
                 bewusster und gleichzeitig freudvoll näherzubringen.
             </p>
 
-            <p>
+            <p data-i18n="motivation_p2">
                 Wir wollten einen Rahmen schaffen, in dem Kinder diesen besonderen Monat aktiv erleben können:
                 mit kleinen täglichen Impulsen, Aufgaben, Spielen und Reflexionsmomenten – altersgerecht und liebevoll
                 gestaltet.
             </p>
 
-            <p>
+            <p data-i18n="motivation_p3">
                 Unser Ziel ist es, Ramadan nicht nur als Zeit des Verzichts, sondern als Zeit der Achtsamkeit,
                 Dankbarkeit und Nächstenliebe erfahrbar zu machen.
             </p>
 
-            <p>
+            <p data-i18n="motivation_p4">
                 Gleichzeitig ist der Kalender mit einer freiwilligen Spendenaktion verbunden. So möchten wir gemeinsam
                 mit den Kindern ein Zeichen setzen und zeigen, dass Ramadan auch Verantwortung und Mitgefühl bedeutet.
             </p>
 
-            <p>
+            <p data-i18n="motivation_p5">
                 Es geht uns darum, Werte erlebbar zu machen – spielerisch, bewusst und mit Herz.
             </p>
 
@@ -171,7 +182,7 @@
                 border-radius: var(--radius-md);
                 padding: 16px;
                 margin: 24px 0;
-            ">
+            " data-i18n="spenden_note">
                 <p style="margin-bottom: 0; color: var(--text-primary);">
                     <strong>💛 100% für den guten Zweck:</strong> Die gesammelten Spenden werden zu 100 % an Kinder
                     gespendet.
@@ -182,46 +193,50 @@
                 </p>
             </div>
 
-            <p style="text-align: center; font-style: italic; color: var(--gold-light); margin-top: 24px;">
+            <p style="text-align: center; font-style: italic; color: var(--gold-light); margin-top: 24px;"
+                data-i18n="motivation_footer">
                 Wir freuen uns, wenn Sie diesen Weg gemeinsam mit Ihren Kindern gehen 🌙✨
             </p>
 
-            <h2>Ideen für die Umsetzung der Aufgaben</h2>
+            <h2 data-i18n="ideas_title">Ideen für die Umsetzung der Aufgaben</h2>
 
-            <p>
+            <p data-i18n="ideas_p1">
                 Die vorgeschlagenen Belohnungen sind lediglich Beispiele von uns. Natürlich können Sie eigene
                 Belohnungen festlegen, die am besten zu Ihrer Familie passen.
             </p>
 
-            <p>
+            <p data-i18n="ideas_p2">
                 Wenn Sie bei den DIY-Aktivitäten gerne als Wochenbelohnung mitmachen möchten, empfehlen wir, die
                 Materialien vorab zu besorgen.
             </p>
 
             <div class="material-list">
-                <strong>Zum Beispiel für das Tasbih-Basteln:</strong>
+                <strong data-i18n="material_tasbih">Zum Beispiel für das Tasbih-Basteln:</strong>
                 <ul>
-                    <li>📿 33 Perlen</li>
-                    <li>🧵 reißfeste Schnur</li>
-                    <li>💎 ggf. eine größere Abschlussperle</li>
+                    <li data-i18n="material_li1">📿 33 Perlen</li>
+                    <li data-i18n="material_li2">🧵 reißfeste Schnur</li>
+                    <li data-i18n="material_li3">💎 ggf. eine größere Abschlussperle</li>
                 </ul>
             </div>
 
-            <p>So sind Sie gut vorbereitet und können die Aktivität entspannt gemeinsam umsetzen.</p>
+            <p data-i18n="ideas_p3">So sind Sie gut vorbereitet und können die Aktivität entspannt gemeinsam umsetzen.
+            </p>
 
-            <p><strong>Vorgeschlagene Wochenbelohnungen:</strong></p>
+            <p><strong data-i18n="weekly_rewards_title">Vorgeschlagene Wochenbelohnungen:</strong></p>
             <ul class="wochen-belohnungen">
-                <li>🎬 Familien-Filmabend</li>
-                <li>🍪 Gemeinsam etwas für Iftar backen</li>
-                <li>🎲 Spieleabend bestimmen dürfen</li>
-                <li>👑 „Ramadan-Held der Woche“-Urkunde erstellen</li>
-                <li>🍓 Wunsch-Dessert beim Iftar</li>
-                <li>📖 Extra-Geschichte vor dem Schlafengehen</li>
-                <li>🧁 Kleine Back- oder Bastelaktion (z. B. Tasbih basteln)</li>
-                <li>❤️ 1:1-Zeit mit Mama oder Baba</li>
+                <li data-i18n="reward_1">🎬 Familien-Filmabend</li>
+                <li data-i18n="reward_2">🍪 Gemeinsam etwas für Iftar backen</li>
+                <li data-i18n="reward_3">🎲 Spieleabend bestimmen dürfen</li>
+                <li data-i18n="reward_4">👑 „Ramadan-Held der Woche“-Urkunde erstellen</li>
+                <li data-i18n="reward_5">🍓 Wunsch-Dessert beim Iftar</li>
+                <li data-i18n="reward_6">📖 Extra-Geschichte vor dem Schlafengehen</li>
+                <li data-i18n="reward_7">🧁 Kleine Back- oder Bastelaktion (z. B. Tasbih basteln)</li>
+                <li data-i18n="reward_8">❤️ 1:1-Zeit mit Mama oder Baba</li>
             </ul>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js?v=1.1.5"></script>
 </body>
 
 </html>

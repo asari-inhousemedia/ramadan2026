@@ -111,52 +111,65 @@
 </head>
 
 <body>
+    <div class="header">
+        <div class="header-inner">
+            <div class="header-actions" style="justify-content: flex-end; width: 100%;">
+                <div class="lang-switch" id="langSwitch">
+                    <button class="lang-btn active" data-lang="de">DE</button>
+                    <button class="lang-btn" data-lang="tr">TR</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="setup-page" style="max-width: 700px; margin: 0 auto; padding: 20px;">
-        <a href="index.html" class="setup-back">← Zurück zum Kalender</a>
+        <a href="index.html" class="setup-back" data-i18n="back_to_calendar">← Zurück zum Kalender</a>
 
         <div class="info-card-kids">
-            <h1>Wie dein Kalender funktioniert</h1>
+            <h1 data-i18n="how_works_title">Wie dein Kalender funktioniert</h1>
 
             <div class="step-card">
                 <div class="step-icon">⭐</div>
-                <div class="step-text">
+                <div class="step-text" data-i18n="step_1">
                     Für jede Aufgabe, die du an einem Tag schaffst, bekommst du einen <strong>Stern</strong>.
                 </div>
             </div>
 
             <div class="step-card">
                 <div class="step-icon">📅</div>
-                <div class="step-text">
+                <div class="step-text" data-i18n="step_2">
                     Diese Sterne sammelst du während der ganzen Woche.
                 </div>
             </div>
 
             <div class="step-card">
                 <div class="step-icon">🎉</div>
-                <div class="step-text">
+                <div class="step-text" data-i18n="step_3">
                     Nach 7 Tagen schauen wir, wie viele Sterne du gesammelt hast – und dann gibt es eine
                     <strong>Wochenbelohnung</strong>!
                 </div>
             </div>
 
-            <p style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 24px; line-height: 1.6;">
+            <p style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 24px; line-height: 1.6;"
+                data-i18n="kids_p1">
                 Übrigens: Die Belohnungen, die wir zeigen, sind nur Beispiele.<br>
                 Jede Familie kann selbst entscheiden, welche Belohnung sie auswählen möchte. 🎁
             </p>
 
             <div class="important-note">
-                <h2>Wichtig ist:</h2>
-                <p>
+                <h2 data-i18n="important_title">Wichtig ist:</h2>
+                <p data-i18n="important_p1">
                     Nicht die Belohnung zählt am meisten – sondern die guten Taten, die du im Ramadan sammelst 🤍✨
                 </p>
             </div>
 
             <div class="read-aloud-hint">
                 <span>🔊</span>
-                <em>Lass dir diesen Text am besten von deinen Eltern vorlesen.</em>
+                <em data-i18n="read_aloud">Lass dir diesen Text am besten von deinen Eltern vorlesen.</em>
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js?v=1.1.5"></script>
 </body>
 
 </html>

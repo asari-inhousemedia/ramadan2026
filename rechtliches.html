@@ -18,10 +18,22 @@
 </head>
 
 <body>
+    <div class="header">
+        <div class="header-inner">
+            <div class="header-actions" style="justify-content: flex-end; width: 100%;">
+                <div class="lang-switch" id="langSwitch">
+                    <button class="lang-btn active" data-lang="de">DE</button>
+                    <button class="lang-btn" data-lang="tr">TR</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="legal-page">
-        <a href="index.html" class="legal-back">← Zurück zum Kalender</a>
+        <a href="index.html" class="legal-back" data-i18n="back_to_calendar">← Zurück zum Kalender</a>
 
-        <h1>📜 Rechtliches</h1>
+        <h1 data-i18n="footer_legal">📜 Rechtliches</h1>
+        <p style="font-size: 0.9rem; color: var(--gold-light); margin-bottom: 20px;"><em>(Rechtliche Texte sind aktuell
+                nur auf Deutsch verfügbar / Yasal metinler şu an sadece Almanca dilinde mevcuttur)</em></p>
 
         <h2>Impressum</h2>
         <p style="line-height: 1.6;">
@@ -108,6 +120,8 @@
             Stand: Februar 2026 · Version 1.0.0
         </p>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js?v=1.1.5"></script>
 </body>
 
 </html>

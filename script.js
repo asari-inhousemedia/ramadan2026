@@ -6,12 +6,13 @@
 // ========== SUPABASE CONFIG ==========
 const SUPABASE_URL = 'https://thscbzyzblpqwbskymbg.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_w4wZcJW_TOnzxlgr-kMr5Q_aCu8OxTz';
-const APP_VERSION = '1.0.0';
+const APP_VERSION = '1.1.5';
 
 let supabaseClient = null;
 try {
     if (window.supabase && window.supabase.createClient) {
         supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        window.supabaseClient = supabaseClient; // Explicitly global
         console.log('[Ramadan] Supabase client initialized.');
     }
 } catch (e) {
@@ -67,6 +68,405 @@ let currentChild = null;
 let childrenData = [];
 let allProgressData = []; // Cache for all children's scores
 let familyId = null;
+let currentLang = localStorage.getItem('ramadan_lang') || 'de';
+window.currentLang = currentLang;
+window.familyId = familyId;
+
+// ========== I18N ==========
+const I18N = {
+    de: {
+        title: 'Mein Ramadan Kalender 2026',
+        nav_setup: 'Konfigurieren',
+        nav_logout: 'Abmelden',
+        mosaic_counter: 'Dein Bayram-Bild: Noch <span id="tilesLeft">{count}</span> Teile fehlen!',
+        mosaic_empty: 'Kein Bild hochgeladen',
+        mosaic_link: 'Jetzt einrichten →',
+        donation_title: 'Spendenaktion',
+        donation_text: 'Wir spenden alles an bedürftige Kinder – für ein freudiges Bayram für alle!',
+        donation_paypal: 'Spenden',
+        donation_insta: 'Instagram',
+        nav_parents: 'Für Eltern',
+        nav_parents_sub: 'Motivation & Tipps',
+        nav_children: 'Für Kinder',
+        nav_children_sub: 'Infos & Spaß',
+        loading: 'Kalender wird geladen…',
+        modal_day: 'Tag {day}',
+        modal_open_day: 'Tag {day} öffnen',
+        modal_tasks_title: 'Tag {day}: Deine Aufgaben',
+        modal_done: 'Ich hab\'s geschafft! ✨',
+        modal_all_done: 'Super gemacht! 🌙',
+        toast_locked: '⏳ Geduld! Diese Tür öffnet sich erst am {day}. Tag.',
+        celebration_title: 'Bayram Mübarek!',
+        celebration_text: 'Du hast alle 30 Tage geschafft! Dein Geschenk wartet auf dich! 🎁',
+        celebration_btn: 'Geschenk enthüllen! 🌟',
+        footer_setup: '⚙️ Einstellungen',
+        footer_legal: '📜 Rechtliches',
+        footer_copy: '© 2026 Inhouse Media · Mit 💛 gemacht',
+        // Parents Page
+        back_to_calendar: '← Zurück zum Kalender',
+        motivation_title: 'Unsere Motivation',
+        motivation_subtitle: 'Warum wir diesen digitalen Ramadan-Kalender ins Leben gerufen haben',
+        motivation_p1: 'Die Idee zu diesem Projekt ist ganz spontan entstanden – aus dem Wunsch heraus, unseren Kindern Ramadan bewusster und gleichzeitig freudvoll näherzubringen.',
+        motivation_p2: 'Wir wollten einen Rahmen schaffen, in dem Kinder diesen besonderen Monat aktiv erleben können: mit kleinen täglichen Impulsen, Aufgaben, Spielen und Reflexionsmomenten – altersgerecht und liebevoll gestaltet.',
+        motivation_p3: 'Unser Ziel ist es, Ramadan nicht nur als Zeit des Verzichts, sondern als Zeit der Achtsamkeit, Dankbarkeit und Nächstenliebe erfahrbar zu machen.',
+        motivation_p4: 'Gleichzeitig ist der Kalender mit einer freiwilligen Spendenaktion verbunden. So möchten wir gemeinsam mit den Kindern ein Zeichen setzen und zeigen, dass Ramadan auch Verantwortung und Mitgefühl bedeutet.',
+        motivation_p5: 'Es geht uns darum, Werte erlebbar zu machen – spielerisch, bewusst und mit Herz.',
+        spenden_note: '<strong>💛 100% für den guten Zweck:</strong> Die gesammelten Spenden werden zu 100 % an Kinder gespendet. Damit wir gemeinsam das Beste bewirken, entscheiden wir in der <strong>Community über Instagram</strong>, wohin die Hilfe genau fließt. So können wir an Bayram Kindern auf der ganzen Welt eine Freude bereiten!',
+        motivation_footer: 'Wir freuen uns, wenn Sie diesen Weg gemeinsam mit Ihren Kindern gehen 🌙✨',
+        ideas_title: 'Ideen für die Umsetzung der Aufgaben',
+        ideas_p1: 'Die vorgeschlagenen Belohnungen sind lediglich Beispiele von uns. Natürlich können Sie eigene Belohnungen festlegen, die am besten zu Ihrer Familie passen.',
+        ideas_p2: 'Wenn Sie bei den DIY-Aktivitäten gerne als Wochenbelohnung mitmachen möchten, empfehlen wir, die Materialien vorab zu besorgen.',
+        material_tasbih: 'Zum Beispiel für das Tasbih-Basteln:',
+        material_li1: '📿 33 Perlen',
+        material_li2: '🧵 reißfeste Schnur',
+        material_li3: '💎 ggf. eine größere Abschlussperle',
+        ideas_p3: 'So sind Sie gut vorbereitet und können die Aktivität entspannt gemeinsam umsetzen.',
+        weekly_rewards_title: 'Vorgeschlagene Wochenbelohnungen:',
+        reward_1: '🎬 Familien-Filmabend',
+        reward_2: '🍪 Gemeinsam etwas für Iftar backen',
+        reward_3: '🎲 Spieleabend bestimmen dürfen',
+        reward_4: '👑 „Ramadan-Held der Woche“-Urkunde erstellen',
+        reward_5: '🍓 Wunsch-Dessert beim Iftar',
+        reward_6: '📖 Extra-Geschichte vor dem Schlafengehen',
+        reward_7: '🧁 Kleine Back- oder Bastelaktion (z. B. Tasbih basteln)',
+        reward_8: '❤️ 1:1-Zeit mit Mama oder Baba',
+        // Children Page
+        how_works_title: 'Wie dein Kalender funktioniert',
+        step_1: 'Für jede Aufgabe, die du an einem Tag schaffst, bekommst du einen <strong>Stern</strong>.',
+        step_2: 'Diese Sterne sammelst du während der ganzen Woche.',
+        step_3: 'Nach 7 Tagen schauen wir, wie viele Sterne du gesammelt hast – und dann gibt es eine <strong>Wochenbelohnung</strong>!',
+        kids_p1: 'Übrigens: Die Belohnungen, die wir zeigen, sind nur Beispiele.<br>Jede Familie kann selbst entscheiden, welche Belohnung sie auswählen möchte. 🎁',
+        important_title: 'Wichtig ist:',
+        important_p1: 'Nicht die Belohnung zählt am meisten – sondern die guten Taten, die du im Ramadan sammelst 🤍✨',
+        read_aloud: 'Lass dir diesen Text am besten von deinen Eltern vorlesen.',
+        // Setup Page
+        setup_title: 'Einstellungen',
+        setup_how_it_works: '✨ So funktioniert\'s',
+        setup_step1: '1. <strong>Kind anlegen</strong> (nur Vorname)',
+        setup_step2: '2. <strong>Foto vom echten Bayram-Geschenk</strong> hochladen 🎁',
+        setup_hint: 'Tipp: Mach ein Foto von dem Geschenk, das dein Kind am Festtag auch wirklich bekommt. So steigt die Vorfreude jeden Tag!',
+        setup_step3: '3. Jeden Tag öffnet sich ein Teil – an Bayram ist es komplett!',
+        setup_add_children: '👧🧒 Kinder hinzufügen',
+        setup_count: '{count} / {max} Kinder angelegt',
+        setup_logged_in: 'Du bist aktuell eingeloggt.',
+        setup_registered: 'Registriert mit: {email}',
+        setup_info_text: 'Nur <strong style="color:var(--gold-light)">Vorname</strong> eingeben – kein Nachname oder andere persönliche Daten. Lade ein Bild hoch, das dein Kind am <strong style="color:var(--gold-light)">30. Tag (Bayram)</strong> als Geschenk bekommt. 🎁',
+        setup_add_btn: '➕ Kind hinzufügen',
+        setup_save_btn: '💾 Speichern & Zurück',
+        setup_max_reached: '✅ Maximum erreicht ({max} Kinder)',
+        child_label: 'Kind {idx}',
+        child_name_label: 'Vorname des Kindes',
+        child_name_placeholder: 'z.B. Elif, Yusuf, Leyla …',
+        child_img_label: 'Geschenk-Bild (wird hinter dem Mosaik versteckt)',
+        child_img_upload_text: 'Bild auswählen oder hierher ziehen',
+        child_img_change: '🔄 Bild ändern',
+        child_img_remove: '🗑️ Entfernen',
+        // Login Page
+        login_title: 'Anmelden',
+        register_title: 'Registrieren',
+        login_subtitle: 'Melde dich an, um den Kalender zu nutzen.',
+        register_subtitle: 'Erstelle ein Konto für deine Familie.',
+        email_label: 'E-Mail Adresse',
+        password_label: 'Passwort',
+        confirm_password_label: 'Passwort wiederholen',
+        forgot_password_link: 'Passwort vergessen?',
+        privacy_agree_text: 'Ich bin mit der <a href="rechtliches.html" target="_blank">Datenschutzerklärung</a> einverstanden.',
+        login_btn: 'Anmelden',
+        register_btn: 'Konto erstellen',
+        no_account_question: 'Noch kein Konto?',
+        have_account_question: 'Schon registriert?',
+        register_link: 'Hier registrieren',
+        login_link: 'Hier anmelden',
+        reset_title: 'Passwort vergessen',
+        reset_subtitle: 'Gib deine E-Mail ein, um einen Reset-Link zu erhalten.',
+        reset_btn: 'Reset-Link senden',
+        reset_back_question: 'Wieder eingefallen?',
+        reset_back_link: 'Zum Login',
+        wait_text: 'Bitte warten...',
+        privacy_error: 'Bitte akzeptiere die Datenschutzerklärung.',
+        password_mismatch: 'Die Passwörter stimmen nicht überein.',
+        reset_success: 'Checke deine E-Mails! Wir haben dir einen Link geschickt.',
+        account_created: 'Konto erstellt! Bitte melde dich jetzt an.'
+    },
+    tr: {
+        title: 'Ramazan Takvimim 2026',
+        nav_setup: 'Ayarlar',
+        nav_logout: 'Çıkış Yap',
+        mosaic_counter: 'Bayram Resmin: Daha <span id="tilesLeft">{count}</span> parça eksik!',
+        mosaic_empty: 'Resim yüklenmedi',
+        mosaic_link: 'Şimdi ayarla →',
+        donation_title: 'Bağış Kampanyası',
+        donation_text: 'Tüm bağışları ihtiyaç sahibi çocuklara gönderiyoruz – herkes için mutlu bir Bayram!',
+        donation_paypal: 'Bağış Yap',
+        donation_insta: 'Instagram',
+        nav_parents: 'Ebeveynlere',
+        nav_parents_sub: 'Motivasyon & İpuçları',
+        nav_children: 'Çocuklara',
+        nav_children_sub: 'Bilgi & Eğlence',
+        loading: 'Takvim yükleniyor…',
+        modal_day: 'Gün {day}',
+        modal_open_day: '{day}. günü aç',
+        modal_tasks_title: 'Gün {day}: Görevlerin',
+        modal_done: 'Başardım! ✨',
+        modal_all_done: 'Harika gidiyorsun! 🌙',
+        toast_locked: '⏳ Sabır! Bu kapı ancak {day}. günde açılır.',
+        celebration_title: 'Bayramınız Mübarek Olsun!',
+        celebration_text: '30 günün hepsini tamamladın! Hediyen seni bekliyor! 🎁',
+        celebration_btn: 'Hediyeyi aç! 🌟',
+        footer_setup: '⚙️ Ayarlar',
+        footer_legal: '📜 Yasal Bilgiler',
+        footer_copy: '© 2026 Inhouse Media · 💛 ile yapıldı',
+        // Parents Page
+        back_to_calendar: '← Takvime geri dön',
+        motivation_title: 'Motivasyonumuz',
+        motivation_subtitle: 'Bu dijital Ramazan takvimini neden hayata geçirdik?',
+        motivation_p1: 'Bu proje fikri tamamen kendiliğinden gelişti – çocuklarımıza Ramazan\'ı daha bilinçli ve aynı zamanda neşeyle anlatma isteğimizden doğdu.',
+        motivation_p2: 'Çocukların bu özel ayı aktif bir şekilde yaşayabilecekleri bir ortam oluşturmak istedik: küçük günlük teşvikler, görevler, oyunlar ve tefekkür anları ile – yaşlarına uygun ve sevgiyle tasarlanmış.',
+        motivation_p3: 'Amacımız, Ramazan\'ı sadece bir mahrumiyet zamanı değil, aynı zamanda farkındalık, şükür ve yardımlaşma zamanı olarak deneyimletmek.',
+        motivation_p4: 'Aynı zamanda takvim, gönüllü bir bağış kampanyası ile bağlantılıdır. Böylece çocuklarla birlikte bir işaret koymak ve Ramazan\'ın aynı zamanda sorumluluk ve merhamet anlamına geldiğini göstermek istiyoruz.',
+        motivation_p5: 'Bizim için önemli olan değerleri yaşatmak – oyunla, bilinçli ve yürekten.',
+        spenden_note: '<strong>💛 %100 iyilik için:</strong> Toplanan bağışların tamamı ihtiyaç sahibi çocuklara gönderilecektir. Birlikte en iyisini yapabilmek için yardımın nereye gideceğine <strong>Instagram topluluğumuz</strong> üzerinden karar veriyoruz. Böylece Bayram\'da dünyanın dört bir yanındaki çocukları mutlu edebiliriz!',
+        motivation_footer: 'Bu yolda çocuklarınızla birlikte yürümenizden mutluluk duyarız 🌙✨',
+        ideas_title: 'Görevlerin Uygulanması İçin Fikirler',
+        ideas_p1: 'Önerilen ödüller sadece bizim örneklerimizdir. Elbette ailenize en uygun kendi ödüllerinizi belirleyebilirsiniz.',
+        ideas_p2: 'Eğer haftalık ödül olarak DIY (kendin yap) aktivitelerine katılmak isterseniz, malzemeleri önceden temin etmenizi öneririz.',
+        material_tasbih: 'Örneğin tespih yapımı için:',
+        material_li1: '📿 33 boncuk',
+        material_li2: '🧵 sağlam ip',
+        material_li3: '💎 gerekirse daha büyük bir imame boncuğu',
+        ideas_p3: 'Böylece iyi hazırlanmış olursunuz ve aktiviteyi birlikte keyifle yapabilirsiniz.',
+        weekly_rewards_title: 'Önerilen Haftalık Ödüller:',
+        reward_1: '🎬 Ailece film gecesi',
+        reward_2: '🍪 İftar için birlikte bir şeyler pişirmek',
+        reward_3: '🎲 Oyun gecesini seçme hakkı',
+        reward_4: '👑 „Haftanın Ramazan Kahramanı“ belgesi hazırlamak',
+        reward_5: '🍓 İftarda rüya tatlısı',
+        reward_6: '📖 Yatmadan önce ekstra masal',
+        reward_7: '🧁 Küçük pişirme veya el işi aktivitesi (örn. tespih yapma)',
+        reward_8: '❤️ Anne veya baba ile 1:1 özel vakit',
+        // Children Page
+        how_works_title: 'Takvimin Nasıl Çalışır?',
+        step_1: 'Bir günde başardığın her görev için bir <strong>yıldız</strong> kazanırsın.',
+        step_2: 'bu yıldızları tüm hafta boyunca toplarsın.',
+        step_3: '7 günün sonunda kaç yıldız topladığına bakıyoruz – ve sonra bir <strong>haftalık ödül</strong> var!',
+        kids_p1: 'Bu arada: Gösterdiğimiz ödüller sadece örnektir.<br>Her aile hangi ödülü seçeceğine kendisi karar verebilir. 🎁',
+        important_title: 'Önemli Olan:',
+        important_p1: 'En önemli olan ödül değil, Ramazan boyunca topladığın iyiliklerdir 🤍✨',
+        read_aloud: 'Bu metni ailene sesli okutabilirsin.',
+        // Setup Page
+        setup_title: 'Ayarlar',
+        setup_how_it_works: '✨ Nasıl Çalışır?',
+        setup_step1: '1. <strong>Çocuk ekle</strong> (sadece isim)',
+        setup_step2: '2. <strong>Gerçek Bayram hediyesinin fotoğrafını</strong> yükle 🎁',
+        setup_hint: 'İpucu: Çocuğunuzun bayramda gerçekten alacağı hediyenin fotoğrafını çekin. Böylece her gün heyecanı artar!',
+        setup_step3: '3. Her gün bir parça açılır – Bayram\'da tamamlanır!',
+        setup_add_children: '👧🧒 Çocuk Ekle',
+        setup_count: '{count} / {max} Çocuk eklendi',
+        setup_logged_in: 'Şu an giriş yapmış durumdasınız.',
+        setup_registered: '{email} ile kayıtlı',
+        setup_info_text: 'Sadece <strong style="color:var(--gold-light)">İsim</strong> girin – soyisim veya başka kişisel veri yok. Çocuğunun <strong style="color:var(--gold-light)">30. günde (Bayram)</strong> hediye olarak alacağı bir resim yükle. 🎁',
+        setup_add_btn: '➕ Çocuk Ekle',
+        setup_save_btn: '💾 Kaydet ve Geri Dön',
+        setup_max_reached: '✅ Sınıra ulaşıldı ({max} Çocuk)',
+        child_label: 'Çocuk {idx}',
+        child_name_label: 'Çocuğun İsmi',
+        child_name_placeholder: 'örn. Elif, Yusuf, Leyla …',
+        child_img_label: 'Hediye Resmi (mozaik arkasına gizlenecektir)',
+        child_img_upload_text: 'Resim seçin veya buraya sürükleyin',
+        child_img_change: '🔄 Resmi Değiştir',
+        child_img_remove: '🗑️ Kaldır',
+        // Login Page
+        login_title: 'Giriş Yap',
+        register_title: 'Kayıt Ol',
+        login_subtitle: 'Takvimi kullanmak için giriş yapın.',
+        register_subtitle: 'Aileniz için bir hesap oluşturun.',
+        email_label: 'E-posta Adresi',
+        password_label: 'Şifre',
+        confirm_password_label: 'Şifreyi Tekrarla',
+        forgot_password_link: 'Şifremi Unuttum?',
+        privacy_agree_text: '<a href="rechtliches.html" target="_blank">Gizlilik politikasını</a> kabul ediyorum.',
+        login_btn: 'Giriş Yap',
+        register_btn: 'Hesap Oluştur',
+        no_account_question: 'Henüz hesabınız yok mu?',
+        have_account_question: 'Zaten kayıtlı mısınız?',
+        register_link: 'Buradan kayıt olun',
+        login_link: 'Buradan giriş yapın',
+        reset_title: 'Şifremi Unuttum',
+        reset_subtitle: 'Sıfırlama bağlantısı almak için e-postanızı girin.',
+        reset_btn: 'Sıfırlama Bağlantısı Gönder',
+        reset_back_question: 'Hatırladınız mı?',
+        reset_back_link: 'Giriş ekranına dön',
+        wait_text: 'Lütfen bekleyin...',
+        privacy_error: 'Lütfen gizlilik politikasını kabul edin.',
+        password_mismatch: 'Şifreler eşleşmiyor.',
+        reset_success: 'E-postalarınızı kontrol edin! Size bir bağlantı gönderdik.',
+        account_created: 'Hesap oluşturuldu! Lütfen şimdi giriş yapın.'
+    }
+};
+
+const TASK_TRANSLATIONS = {
+    tr: {
+        // Day 1
+        'f1-1': { title: 'Selamlaşma', task: 'Ailendeki herkese „Hayırlı Ramazanlar!" veya „Ramadan Mubarak!" de.' },
+        'f1-2': { title: 'Anlama', task: 'Ailene sor: „Müslümanlar neden Ramazan\'da oruç tutar?" ve onları dikkatlice dinle.' },
+        'f1-3': { title: 'Kalp Görevi', task: 'Ramazan\'da seni mutlu eden bir şeyin resmini çiz.' },
+        // Day 2
+        'f2-1': { title: 'Yardım Etme', task: 'İftar sofrasını kurarken yardım et.' },
+        'f2-2': { title: 'Nazik Olma', task: 'Bugün en az 3 kere kimseden uyarı almadan „Teşekkür ederim" de.' },
+        'f2-3': { title: 'Dikkat ve Özen', task: 'Aileden birine sor: „Sana yardım edebilir miyim?"' },
+        // Day 3
+        'f3-1': { title: 'Tefekkür', task: 'Bugün şükrettiğin 3 şeyi düşün ve ailene anlat.' },
+        'f3-2': { title: 'Teşekkür Etme', task: 'Daha önce hiç gerçekten „Teşekkür ederim" demediğin birine teşekkür et.' },
+        'f3-3': { title: 'Karşılaştırma', task: 'Ailenle konuş: Başkalarında olmayan neyimiz var?' },
+        // Day 4
+        'f4': { title: 'Güzel Sözler', task: 'Bugün sadece nazik ve güzel şeyler söyle. Kavga etmek ve kalp kırmak yok.' },
+        // Day 5
+        'f5': { title: 'Toplama', task: '5 oyuncağını oder eşyanı doğru yerlerine kaldır.' },
+        // Day 6
+        'f6': { title: 'Mektup Yazma', task: 'Sevdiğin birine güzel bir mektup veya mesaj yaz.' },
+        // Day 7
+        'f7': { title: 'Doğanın Tadını Çıkar', task: 'Bugün dışarı çık ve doğa için Allah\'a şükret.' },
+        // Day 8
+        'f8': { title: 'Barışma', task: 'Bugün küs olduğun biri varsa onunla barış.' },
+        // Day 9
+        'f9': { title: 'Bağış', task: 'Bugün küçük de olsa bir bağış yap veya bir iyilikte bulun.' },
+        // Day 10
+        'f10': { title: 'Oyuncak Paylaşma', task: 'Artık oynamadığın bir oyuncağını birine hediye et.' },
+        // Day 11
+        'f11': { title: 'Camii Ziyareti', task: 'Bugün cemaatle namaz kılmak için camiyi ziyaret et.' },
+        // Day 12
+        'f12': { title: 'Büyükleri Ziyaret', task: 'Bugün büyükanne, büyükbaba veya yaşlı komşularını ziyaret et veya onları ara.' },
+        // Day 13
+        'f13': { title: 'Yaratıcı Ol', task: 'Ramazan temalı güzel bir resim çiz.' },
+        // Day 14
+        'f14': { title: 'Fazladan Namaz', task: 'Bugün fazladan bir nafile namaz kıl.' },
+        // Day 15
+        'f15': { title: 'Hikaye Öğren', task: 'Bugün bir peygamberin hayatından bir hikaye öğren.' },
+        // Day 16
+        'f16': { title: 'Suyun Değeri', task: 'Bugün her su içtiğinde suyun ne kadar değerli olduğunu düşün.' },
+        // Day 17
+        'f17': { title: 'Gece Namazı', task: 'Bu gece uyanıp kısa bir namaz kılmayı dene.' },
+        // Day 18
+        'f18': { title: 'Aile', task: 'Bugün ailene özel vakit ayır.' },
+        // Day 19
+        'f19': { title: 'Pişirme', task: 'Bugün kurabiye veya kek yapıp başkalarıyla paylaş.' },
+        // Day 20
+        'f20': { title: 'Düzen', task: 'Bugün odanı iyice topla ve temiz tut.' },
+        // Day 21
+        'f21': { title: 'Sabır', task: 'Bugün özellikle sabırlı olmaya çalış – zor gelse bile.' },
+        // Day 22
+        'f22': { title: 'Sürpriz', task: 'Bugün birine küçük bir sürpriz yapıp onu mutlu et.' },
+        // Day 23
+        'f23': { title: 'Zikir', task: 'Bugün gün boyunca 100 defa „SubhanAllah“ de.' },
+        // Day 24
+        'f24': { title: 'Örnek Ol', task: 'Bugün diğer çocuklara iyi bir örnek ol.' },
+        // Day 25
+        'f25': { title: 'Şükür', task: 'Bugün şükrettiğin 5 şeyi not et.' },
+        // Day 26
+        'f26': { title: 'Barış Sağlama', task: 'Bugün başkaları arasındaki bir tartışmayı çözmeye yardım et.' },
+        // Day 27
+        'f27': { title: 'Kadir Gecesi', task: 'Bugün Kadir Gecesi olabilir – özellikle çok dua et!' },
+        // Day 28
+        'f28': { title: 'Anne Babaya Sevgi', task: 'Bugün anne ve babana onları ne kadar çok sevdiğini söyle.' },
+        // Day 29
+        'f29': { title: 'Gün Doğumu', task: 'Bugün erken uyan ve gün doğumunu izle.' },
+        // Day 30
+        'f30': { title: 'Bayram Heyecanı', task: 'Bugün Bayram şenliği için hazırlan – hediyen seni bekliyor! 🎁' }
+    }
+};
+
+// ========== I18N LOGIC ==========
+function setupLanguageSwitcher() {
+    const langSwitch = document.getElementById('langSwitch');
+    if (!langSwitch) return;
+
+    const btns = langSwitch.querySelectorAll('.lang-btn');
+    btns.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === currentLang);
+        btn.addEventListener('click', () => {
+            currentLang = btn.dataset.lang;
+            localStorage.setItem('ramadan_lang', currentLang);
+            btns.forEach(b => b.classList.toggle('active', b.dataset.lang === currentLang));
+            updateUI();
+
+            // Re-render components that depend on lang
+            if (typeof buildMosaicGrid === 'function') buildMosaicGrid();
+            if (typeof buildCalendarGrid === 'function') buildCalendarGrid();
+            if (typeof renderChildTabs === 'function') renderChildTabs();
+            if (typeof updateTilesCounter === 'function') updateTilesCounter();
+            if (typeof updateChildrenCount === 'function') updateChildrenCount();
+            if (typeof updateAddButton === 'function') updateAddButton();
+            if (typeof relabelChildren === 'function') relabelChildren();
+        });
+    });
+}
+
+function t(key, data = {}) {
+    const local = I18N[currentLang] || I18N['de'];
+    let str = local[key] || I18N['de'][key] || key;
+
+    // Replace placeholders like {day} or {count}
+    Object.keys(data).forEach(k => {
+        // Use replaceAll if available, otherwise a global regex
+        if (str.replaceAll) {
+            str = str.replaceAll(`{${k}}`, data[k]);
+        } else {
+            const regex = new RegExp(`\\{${k}\\}`, 'g');
+            str = str.replace(regex, data[k]);
+        }
+    });
+
+    return str;
+}
+
+function updateUI() {
+    // 1. Update document title
+    document.title = t('title');
+
+    // 2. Update elements with data-i18n attribute
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        const dataStr = el.dataset.i18nData;
+        let data = {};
+        if (dataStr) {
+            try { data = JSON.parse(dataStr); } catch (e) { }
+        }
+
+        const translation = t(key, data);
+        if (translation.includes('<')) {
+            el.innerHTML = translation;
+        } else {
+            el.textContent = translation;
+        }
+    });
+
+    // 3. Update placeholders
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        el.placeholder = t(el.dataset.i18nPlaceholder);
+    });
+
+    // 4. Special cases (HTML content or complex selectors)
+    const mosaicCounter = document.getElementById('mosaicCounter');
+    if (mosaicCounter) {
+        const countValue = (typeof revealedTiles !== 'undefined' && revealedTiles.length) ? 90 - revealedTiles.length : 90;
+        mosaicCounter.innerHTML = t('mosaic_counter', { count: countValue });
+    }
+
+    const mainTitle = document.querySelector('.main-title');
+    if (mainTitle) mainTitle.textContent = t('title');
+
+    const childCountEl = document.getElementById('childrenCount');
+    const actualMax = window.MAX_CHILDREN || (typeof MAX_CHILDREN !== 'undefined' ? MAX_CHILDREN : null);
+    if (childCountEl && actualMax !== null) {
+        const currentCount = document.querySelectorAll('.child-card').length;
+        childCountEl.textContent = t('setup_count', { count: currentCount, max: actualMax });
+    }
+    // Setup page email info
+    const emailInfo = document.getElementById('userEmailInfo');
+    if (emailInfo && familyId) {
+        // This is handled in setup.html init but we can try to update it if we have session info
+    }
+}
 
 // ========== UTILS ==========
 function sanitize(str) {
@@ -170,6 +570,10 @@ function showUpdateBanner(worker) {
 
 // ========== INIT ==========
 document.addEventListener('DOMContentLoaded', async () => {
+    // ALWAYS initialize translations first
+    setupLanguageSwitcher();
+    updateUI();
+
     // Only run on main calendar page
     if (!document.getElementById('calendarGrid')) return;
 
@@ -196,6 +600,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const indices = Array.from({ length: 90 }, (_, i) => i);
     tileMapping = seededShuffle(indices, seed);
     console.log('[Ramadan] Tile mapping (90) initialized.');
+
+    // Initialize translations
+    setupLanguageSwitcher();
+    updateUI();
 
     registerServiceWorker();
     createFloatingSymbols();
@@ -526,7 +934,7 @@ function buildCalendarGrid() {
         day.dataset.day = i;
         day.textContent = i;
         day.setAttribute('role', 'button');
-        day.setAttribute('aria-label', `Tag ${i} öffnen`);
+        day.setAttribute('aria-label', t('modal_open_day', { day: i }));
         day.setAttribute('tabindex', '0');
 
         let isLocked = false;
@@ -551,7 +959,7 @@ function buildCalendarGrid() {
             day.innerHTML = `<span class="lock-icon">🔒</span><span class="day-num">${i}</span>`;
             day.addEventListener('click', (e) => {
                 e.stopPropagation();
-                showToast(`⏳ Geduld! Diese Tür öffnet sich erst am ${i}. Tag.`);
+                showToast(t('toast_locked', { day: i }));
             });
         } else {
             // Offene Tür: Click erlaubt
@@ -622,8 +1030,8 @@ function openModal(dayNum) {
     const title = document.getElementById('modalTitle');
     const taskContainer = document.getElementById('modalTask');
 
-    badge.textContent = `Tag ${dayNum}`;
-    title.textContent = `Tag ${dayNum}: Deine Aufgaben`;
+    badge.textContent = t('modal_day', { day: dayNum });
+    title.textContent = t('modal_tasks_title', { day: dayNum });
 
     taskContainer.innerHTML = '';
 
@@ -641,12 +1049,37 @@ function openModal(dayNum) {
             border-left: 4px solid ${isDone ? '#3de8a0' : 'var(--gold-primary)'};
         `;
 
+        // Translate task if available
+        let displayTitle = taskData.title;
+        let displayTask = taskData.task;
+
+        if (currentLang !== 'de' && TASK_TRANSLATIONS[currentLang]) {
+            // 1. Try direct ID lookup (for Fallback Tasks)
+            let trans = TASK_TRANSLATIONS[currentLang][taskData.id];
+
+            // 2. Fallback: Lookup by Day & Index (for Supabase Tasks with UUIDs)
+            if (!trans) {
+                const indexInDay = tasksForDay.indexOf(taskData);
+                // Pattern: f1-1, f1-2, f1-3 (for day 1-3) or f4, f5... (for day 4-30)
+                let fallbackId = `f${dayNum}`;
+                if (dayNum <= 3) {
+                    fallbackId = `f${dayNum}-${indexInDay + 1}`;
+                }
+                trans = TASK_TRANSLATIONS[currentLang][fallbackId];
+            }
+
+            if (trans) {
+                displayTitle = trans.title;
+                displayTask = trans.task;
+            }
+        }
+
         taskEl.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h4 style="margin:0; font-size:1.05rem; color:var(--modal-text);">${taskData.icon || '🌙'} ${sanitize(taskData.title)}</h4>
+                <h4 style="margin:0; font-size:1.05rem; color:var(--modal-text);">${taskData.icon || '🌙'} ${sanitize(displayTitle)}</h4>
                 ${isDone ? '<span style="color:#2ecc71; font-weight:700;">✅</span>' : ''}
             </div>
-            <p style="margin:8px 0 12px 0; font-size:0.95rem; color:var(--modal-text-secondary); line-height:1.4;">${sanitize(taskData.task)}</p>
+            <p style="margin:8px 0 12px 0; font-size:0.95rem; color:var(--modal-text-secondary); line-height:1.4;">${sanitize(displayTask)}</p>
             ${!isDone ? `<button class="modal-btn-small" onclick="window.markTaskCompleted('${taskData.id}', ${dayNum})" style="
                 background: var(--gold-primary);
                 color: white;
@@ -656,7 +1089,7 @@ function openModal(dayNum) {
                 font-size: 0.85rem;
                 cursor: pointer;
                 transition: opacity 0.2s;
-            ">Ich hab's geschafft! ⭐</button>` : ''}
+            ">${t('modal_done')}</button>` : ''}
         `;
         taskContainer.appendChild(taskEl);
     });
@@ -665,7 +1098,7 @@ function openModal(dayNum) {
     const allDone = tasksForDay.every(t => completedTasks.includes(t.id));
     const doneBtn = document.getElementById('modalDoneBtn');
     if (doneBtn) {
-        doneBtn.textContent = allDone ? 'Super gemacht! 🌙' : 'Ich hab\'s geschafft! ✨';
+        doneBtn.textContent = allDone ? t('modal_all_done') : t('modal_done');
     }
 
     overlay.classList.add('active');
@@ -762,6 +1195,11 @@ function updateTilesCounter() {
     if (el) {
         const left = 90 - revealedTiles.length;
         el.textContent = left;
+    }
+    // Also update the description if needed via updateUI
+    const mosaicCounter = document.getElementById('mosaicCounter');
+    if (mosaicCounter) {
+        mosaicCounter.innerHTML = t('mosaic_counter', { count: 90 - revealedTiles.length });
     }
 }
 
