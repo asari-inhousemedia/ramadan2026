@@ -99,7 +99,7 @@
 
         const SUPABASE_URL = 'https://thscbzyzblpqwbskymbg.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_w4wZcJW_TOnzxlgr-kMr5Q_aCu8OxTz';
-        const MAX_CHILDREN = 5;
+        const MAX_CHILDREN = 3;
         const MAX_NAME_LENGTH = 30;
 
         let supabaseClient = null;
@@ -225,7 +225,7 @@
         function addChild(existingName, existingImage) {
             const currentCards = document.querySelectorAll('.child-card').length;
             if (currentCards >= MAX_CHILDREN) {
-                showToast('Maximal 5 Kinder möglich!', true);
+                showToast(`Maximal ${MAX_CHILDREN} Kinder möglich!`, true);
                 return;
             }
 
