@@ -157,6 +157,69 @@
             border-radius: 10px;
         }
 
+        .privacy-group {
+            display: none;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 20px;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(240, 208, 120, 0.1);
+        }
+
+        .privacy-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            cursor: pointer;
+        }
+
+        .privacy-text {
+            font-size: 0.8rem;
+            color: #a8afc8;
+            line-height: 1.5;
+        }
+
+        .privacy-text a {
+            color: #f0d078;
+            text-decoration: underline;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            width: 100%;
+            padding: 20px;
+            z-index: 10;
+        }
+
+        .footer-nav {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .footer-nav a {
+            color: #f0d078;
+            text-decoration: none;
+            font-size: 0.85rem;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .footer-nav a:hover {
+            opacity: 1;
+        }
+
+        .footer-copy {
+            font-size: 0.75rem;
+            color: #a8afc8;
+            opacity: 0.6;
+        }
+
         .ver-tag {
             position: fixed;
             bottom: 10px;
@@ -184,6 +247,17 @@
                     <label>Passwort</label>
                     <input type="password" id="password" placeholder="Mindestens 6 Zeichen" required minlength="6">
                 </div>
+
+                <!-- Datenschutz Checkbox (nur bei Registrierung) -->
+                <div id="privacyArea" class="privacy-group">
+                    <input type="checkbox" id="privacyCheck">
+                    <label for="privacyCheck" class="privacy-text"
+                        style="color: inherit; font-weight: normal; margin: 0; cursor: pointer;">
+                        Ich bin mit der <a href="rechtliches.html" target="_blank">Datenschutzerklärung</a>
+                        einverstanden.
+                    </label>
+                </div>
+
                 <button type="submit" class="auth-btn" id="submitBtn">Anmelden</button>
                 <div id="errorMsg" class="error-msg"></div>
             </form>
@@ -198,7 +272,15 @@
         </div>
     </div>
 
-    <div class="ver-tag">v1.0.9</div>
+    <!-- Footer -->
+    <footer class="footer">
+        <nav class="footer-nav">
+            <a href="rechtliches.html">📜 Rechtliches & Datenschutz</a>
+        </nav>
+        <p class="footer-copy">© 2026 Inhouse Media · Mit 💛 gemacht</p>
+    </footer>
+
+    <div class="ver-tag">v1.1.2</div>
 
     <script>
         // Supabase Initialization
@@ -207,13 +289,52 @@
                 const URL = 'https://thscbzyzblpqwbskymbg.supabase.co';
                 const KEY = 'sb_publishable_w4wZcJW_TOnzxlgr-kMr5Q_aCu8OxTz';
                 window.sb = window.supabase.createClient(URL, KEY);
-                console.log("Supabase bereit (v1.0.9)");
+                console.log("Supabase bereit (v1.1.2)");
             } catch (e) { console.error("Supabase Error:", e); }
         })();
+
+        window.isLoginMode = true;
+
+        function doToggle() {
+            window.isLoginMode = !window.isLoginMode;
+            var title = document.getElementById('pageTitle');
+            var sub = document.getElementById('pageSubtitle');
+            var btn = document.getElementById('submitBtn');
+            var q = document.getElementById('toggleQuestion');
+            var tLink = document.getElementById('toggleBtn');
+            var priv = document.getElementById('privacyArea');
+
+            if (window.isLoginMode) {
+                title.innerText = 'Anmelden';
+                sub.innerText = 'Melde dich an, um den Kalender zu nutzen.';
+                btn.innerText = 'Anmelden';
+                q.innerText = 'Noch kein Konto?';
+                tLink.innerText = 'Hier registrieren';
+                priv.style.display = 'none';
+            } else {
+                title.innerText = 'Registrieren';
+                sub.innerText = 'Erstelle ein Konto für deine Familie.';
+                btn.innerText = 'Konto erstellen';
+                q.innerText = 'Bereit ein Konto?';
+                tLink.innerText = 'Hier anmelden';
+                priv.style.display = 'flex';
+            }
+        }
 
         async function handleAuth() {
             console.log("Auth gestartet...");
             if (!window.sb) { alert("Serververbindung fehlt."); return; }
+
+            // Check Privacy for Registration
+            if (!window.isLoginMode) {
+                const checked = document.getElementById('privacyCheck').checked;
+                if (!checked) {
+                    var errBox = document.getElementById('errorMsg');
+                    errBox.innerText = "Bitte akzeptiere die Datenschutzerklärung.";
+                    errBox.style.display = 'block';
+                    return;
+                }
+            }
 
             var email = document.getElementById('email').value;
             var password = document.getElementById('password').value;
@@ -244,6 +365,7 @@
                     } else {
                         errBox.innerText = "Konto erstellt! Bitte melde dich jetzt an.";
                         errBox.style.display = 'block';
+                        window.isLoginMode = false; // Trigger toggle back
                         window.doToggle();
                     }
                 }
