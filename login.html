@@ -154,7 +154,7 @@
                 </p>
             </div>
 
-            <form id="authForm" onsubmit="handleAuth(event)">
+            <form id="authForm">
                 <div class="input-group">
                     <label for="email">E-Mail Adresse</label>
                     <input type="email" id="email" placeholder="name@beispiel.de" required>
@@ -171,7 +171,7 @@
 
             <p class="toggle-text">
                 <span id="toggleQuestion">Noch kein Konto?</span>
-                <span class="toggle-link" onclick="toggleMode()" id="toggleBtn">Hier registrieren</span>
+                <span class="toggle-link" id="toggleBtn">Hier registrieren</span>
             </p>
         </div>
 
@@ -189,15 +189,28 @@
 
         let isLoginMode = true;
 
-        // Check if already logged in -> Redirect
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            if (session) {
-                window.location.href = 'index.html';
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('toggleBtn');
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', toggleMode);
             }
+
+            const authForm = document.getElementById('authForm');
+            if (authForm) {
+                authForm.addEventListener('submit', handleAuth);
+            }
+
+            // Check if already logged in -> Redirect
+            supabase.auth.getSession().then(({ data: { session } }) => {
+                if (session) {
+                    window.location.href = 'index.html';
+                }
+            });
         });
 
         function toggleMode() {
             isLoginMode = !isLoginMode;
+
             const title = document.getElementById('pageTitle');
             const sub = document.getElementById('pageSubtitle');
             const btn = document.getElementById('submitBtn');
@@ -205,33 +218,39 @@
             const tBtn = document.getElementById('toggleBtn');
             const err = document.getElementById('errorMsg');
 
-            err.style.display = 'none';
+            if (err) err.style.display = 'none';
 
             if (isLoginMode) {
-                title.textContent = 'Anmelden';
-                sub.textContent = 'Willkommen zurück! Melde dich an, um deinen Fortschritt zu sehen.';
-                btn.textContent = 'Anmelden';
-                q.textContent = 'Noch kein Konto?';
-                tBtn.textContent = 'Hier registrieren';
+                if (title) title.textContent = 'Anmelden';
+                if (sub) sub.textContent = 'Willkommen zurück! Melde dich an, um deinen Fortschritt zu sehen.';
+                if (btn) btn.textContent = 'Anmelden';
+                if (q) q.textContent = 'Noch kein Konto?';
+                if (tBtn) tBtn.textContent = 'Hier registrieren';
             } else {
-                title.textContent = 'Registrieren';
-                sub.textContent = 'Erstelle ein kostenloses Konto für deine Familie (dauert nur 10 Sekunden).';
-                btn.textContent = 'Konto erstellen';
-                q.textContent = 'Schon registriert?';
-                tBtn.textContent = 'Hier anmelden';
+                if (title) title.textContent = 'Registrieren';
+                if (sub) sub.textContent = 'Erstelle ein kostenloses Konto für deine Familie (dauert nur 10 Sekunden).';
+                if (btn) btn.textContent = 'Konto erstellen';
+                if (q) q.textContent = 'Schon registriert?';
+                if (tBtn) tBtn.textContent = 'Hier anmelden';
             }
         }
 
         async function handleAuth(e) {
             e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
             const btn = document.getElementById('submitBtn');
             const err = document.getElementById('errorMsg');
 
+            if (!emailInput || !passwordInput) return;
+
+            const email = emailInput.value;
+            const password = passwordInput.value;
+
             btn.disabled = true;
+            const originalBtnText = btn.textContent;
             btn.textContent = 'Lade...';
-            err.style.display = 'none';
+            if (err) err.style.display = 'none';
 
             try {
                 let result;
@@ -242,38 +261,37 @@
                     // SIGN UP
                     result = await supabase.auth.signUp({
                         email,
-                        password,
-                        options: {
-                            // WICHTIG: Wenn "Confirm Email" aus ist, wird der User sofort eingeloggt.
-                        }
+                        password
                     });
                 }
 
                 if (result.error) throw result.error;
 
                 // Success!
-                // Prüfen ob Session da ist
                 if (result.data.session) {
-                    // Speichern einer Flag im LocalStorage, damit wir wissen, dass wir evtl Daten migrieren müssen (optional)
                     if (!isLoginMode) {
                         localStorage.setItem('is_new_signup', 'true');
                     }
                     window.location.href = 'index.html';
                 } else if (!isLoginMode && !result.data.session) {
                     // Fallback: Confirm Email ist vllt doch an?
-                    err.textContent = 'Bitte prüfe deine E-Mails für die Bestätigung!';
-                    err.style.display = 'block';
+                    if (err) {
+                        err.textContent = 'Bitte prüfe deine E-Mails für die Bestätigung!';
+                        err.style.display = 'block';
+                    }
                 }
 
             } catch (error) {
-                console.error(error);
+                console.error('[Auth] Error:', error);
                 let msg = error.message;
                 if (msg.includes('Invalid login credentials')) msg = 'Falsche E-Mail oder Passwort.';
                 if (msg.includes('User already registered')) msg = 'Diese E-Mail ist bereits registriert.';
                 if (msg.includes('Password should be')) msg = 'Passwort muss mindestens 6 Zeichen haben.';
 
-                err.textContent = msg;
-                err.style.display = 'block';
+                if (err) {
+                    err.textContent = msg;
+                    err.style.display = 'block';
+                }
             } finally {
                 btn.disabled = false;
                 btn.textContent = isLoginMode ? 'Anmelden' : 'Konto erstellen';
