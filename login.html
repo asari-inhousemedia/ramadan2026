@@ -96,6 +96,32 @@
         .input-group {
             margin-bottom: 20px;
             text-align: left;
+            position: relative;
+        }
+
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 14px;
+            background: none;
+            border: none;
+            color: #d4a843;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .password-toggle:hover {
+            opacity: 1;
         }
 
         label {
@@ -109,12 +135,18 @@
         input {
             width: 100%;
             padding: 14px;
+            padding-right: 45px;
+            /* Platz für Auge */
             border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             background: rgba(255, 255, 255, 0.05);
             color: #fff;
             font-size: 1rem;
             box-sizing: border-box;
+        }
+
+        input[type="email"] {
+            padding-right: 14px;
         }
 
         .auth-btn {
@@ -243,9 +275,23 @@
                     <label>E-Mail Adresse</label>
                     <input type="email" id="email" placeholder="name@beispiel.de" required>
                 </div>
+
                 <div class="input-group" id="passwordGroup">
                     <label>Passwort</label>
-                    <input type="password" id="password" placeholder="Mindestens 6 Zeichen" minlength="6">
+                    <div class="password-wrapper">
+                        <input type="password" id="password" placeholder="Mindestens 6 Zeichen" minlength="6">
+                        <button type="button" class="password-toggle" onclick="togglePassword('password', this)"
+                            aria-label="Passwort zeigen">👁️</button>
+                    </div>
+                </div>
+
+                <div class="input-group" id="confirmPasswordGroup" style="display: none;">
+                    <label>Passwort wiederholen</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="confirmPassword" placeholder="Passwort bestätigen">
+                        <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword', this)"
+                            aria-label="Passwort zeigen">👁️</button>
+                    </div>
                 </div>
 
                 <div id="forgotPwArea" style="text-align: right; margin-top: -10px; margin-bottom: 20px;">
@@ -301,12 +347,26 @@
         window.isLoginMode = true;
         window.isResetMode = false;
 
+        function togglePassword(id, btn) {
+            const el = document.getElementById(id);
+            if (el.type === 'password') {
+                el.type = 'text';
+                btn.textContent = '🙈';
+                btn.setAttribute('aria-label', 'Passwort verbergen');
+            } else {
+                el.type = 'password';
+                btn.textContent = '👁️';
+                btn.setAttribute('aria-label', 'Passwort zeigen');
+            }
+        }
+
         function showResetMode() {
             window.isResetMode = true;
             document.getElementById('pageTitle').innerText = 'Passwort vergessen';
             document.getElementById('pageSubtitle').innerText = 'Gib deine E-Mail ein, um einen Reset-Link zu erhalten.';
             document.getElementById('submitBtn').innerText = 'Reset-Link senden';
             document.getElementById('passwordGroup').style.display = 'none';
+            document.getElementById('confirmPasswordGroup').style.display = 'none';
             document.getElementById('forgotPwArea').style.display = 'none';
             document.getElementById('privacyArea').style.display = 'none';
             document.getElementById('toggleQuestion').innerText = 'Wieder eingefallen?';
@@ -328,6 +388,7 @@
             var tLink = document.getElementById('toggleBtn');
             var priv = document.getElementById('privacyArea');
             var pw = document.getElementById('passwordGroup');
+            var pwConf = document.getElementById('confirmPasswordGroup');
             var forgot = document.getElementById('forgotPwArea');
 
             pw.style.display = 'block';
@@ -340,6 +401,7 @@
                 tLink.innerText = 'Hier registrieren';
                 priv.style.display = 'none';
                 forgot.style.display = 'block';
+                pwConf.style.display = 'none';
             } else {
                 title.innerText = 'Registrieren';
                 sub.innerText = 'Erstelle ein Konto für deine Familie.';
@@ -348,6 +410,7 @@
                 tLink.innerText = 'Hier anmelden';
                 priv.style.display = 'flex';
                 forgot.style.display = 'none';
+                pwConf.style.display = 'block';
             }
         }
 
@@ -357,6 +420,7 @@
 
             var email = document.getElementById('email').value;
             var password = document.getElementById('password').value;
+            var confirmPassword = document.getElementById('confirmPassword').value;
             var btn = document.getElementById('submitBtn');
             var errBox = document.getElementById('errorMsg');
 
@@ -381,11 +445,19 @@
                     return;
                 }
 
-                // Check Privacy for Registration
+                // Validation for Registration
                 if (!window.isLoginMode) {
+                    // Check Privacy
                     const checked = document.getElementById('privacyCheck').checked;
                     if (!checked) {
                         errBox.innerText = "Bitte akzeptiere die Datenschutzerklärung.";
+                        errBox.style.display = 'block';
+                        return;
+                    }
+
+                    // Check Password Match
+                    if (password !== confirmPassword) {
+                        errBox.innerText = "Die Passwörter stimmen nicht überein.";
                         errBox.style.display = 'block';
                         return;
                     }
