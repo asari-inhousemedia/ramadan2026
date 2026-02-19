@@ -189,24 +189,46 @@
 
         let isLoginMode = true;
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             const toggleBtn = document.getElementById('toggleBtn');
-            if (toggleBtn) {
-                toggleBtn.addEventListener('click', toggleMode);
-            }
-
             const authForm = document.getElementById('authForm');
-            if (authForm) {
-                authForm.addEventListener('submit', handleAuth);
+            const err = document.getElementById('errorMsg');
+
+            // 1. Check Protocol
+            if (window.location.protocol === 'file:') {
+                showError('⚠️ App läuft über "file://". Bitte nutze einen Webserver (z.B. Live Server), sonst funktioniert der Login nicht!');
             }
 
-            // Check if already logged in -> Redirect
-            supabase.auth.getSession().then(({ data: { session } }) => {
-                if (session) {
-                    window.location.href = 'index.html';
+            // 2. Test Connection
+            try {
+                const { error } = await supabase.from('daily_tasks').select('id').limit(1);
+                if (error) {
+                    console.error('[Supabase] Connection failed:', error);
+                    showError('⚠️ Verbindung zu Supabase fehlgeschlagen (Key ggf. ungültig).');
+                } else {
+                    console.log('[Supabase] Connection successful.');
                 }
-            });
+            } catch (e) {
+                showError('⚠️ Supabase konnte nicht geladen werden.');
+            }
+
+            if (toggleBtn) toggleBtn.addEventListener('click', toggleMode);
+            if (authForm) authForm.addEventListener('submit', handleAuth);
+
+            // Check session
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                window.location.href = 'index.html';
+            }
         });
+
+        function showError(msg) {
+            const err = document.getElementById('errorMsg');
+            if (err) {
+                err.textContent = msg;
+                err.style.display = 'block';
+            }
+        }
 
         function toggleMode() {
             isLoginMode = !isLoginMode;
@@ -248,20 +270,22 @@
             const password = passwordInput.value;
 
             btn.disabled = true;
-            const originalBtnText = btn.textContent;
             btn.textContent = 'Lade...';
             if (err) err.style.display = 'none';
 
             try {
                 let result;
                 if (isLoginMode) {
-                    // LOGIN
                     result = await supabase.auth.signInWithPassword({ email, password });
                 } else {
-                    // SIGN UP
+                    // WICHTIG: SignUp
                     result = await supabase.auth.signUp({
                         email,
-                        password
+                        password,
+                        options: {
+                            // Verhindert automatisches Senden von Bestätigungsmails vom Client aus
+                            emailRedirectTo: window.location.origin
+                        }
                     });
                 }
 
@@ -269,29 +293,28 @@
 
                 // Success!
                 if (result.data.session) {
-                    if (!isLoginMode) {
-                        localStorage.setItem('is_new_signup', 'true');
-                    }
                     window.location.href = 'index.html';
-                } else if (!isLoginMode && !result.data.session) {
-                    // Fallback: Confirm Email ist vllt doch an?
-                    if (err) {
-                        err.textContent = 'Bitte prüfe deine E-Mails für die Bestätigung!';
-                        err.style.display = 'block';
+                } else {
+                    // Bei SignUp ohne sofortige Session (Email Confirm ist evtl. doch noch an)
+                    if (!isLoginMode) {
+                        showError('Konto erstellt! Bitte prüfe deine E-Mails (Spam!) oder deaktiviere "Confirm Email" in Supabase.');
+                    } else {
+                        showError('Login fehlgeschlagen. Bitte Daten prüfen.');
                     }
                 }
-
             } catch (error) {
                 console.error('[Auth] Error:', error);
                 let msg = error.message;
+                if (msg === 'Email confirmations are not enabled') {
+                    // Das passiert wenn man versucht sich einzuloggen aber email confirm aus ist? 
+                    // Eigentlich sollte es dann gehen.
+                }
                 if (msg.includes('Invalid login credentials')) msg = 'Falsche E-Mail oder Passwort.';
                 if (msg.includes('User already registered')) msg = 'Diese E-Mail ist bereits registriert.';
                 if (msg.includes('Password should be')) msg = 'Passwort muss mindestens 6 Zeichen haben.';
+                if (msg.includes('Signups are disabled')) msg = 'Registrierung ist aktuell deaktiviert (Supabase Settings prüfen).';
 
-                if (err) {
-                    err.textContent = msg;
-                    err.style.display = 'block';
-                }
+                showError(msg);
             } finally {
                 btn.disabled = false;
                 btn.textContent = isLoginMode ? 'Anmelden' : 'Konto erstellen';
