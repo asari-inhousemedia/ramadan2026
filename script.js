@@ -427,16 +427,22 @@ function buildCalendarGrid() {
         day.setAttribute('aria-label', `Tag ${i} öffnen`);
         day.setAttribute('tabindex', '0');
 
-        if (completedDays.includes(i)) {
+        let isLocked = false;
+
+        // Prüfen, ob der Tag gesperrt sein muss
+        if (today !== null && i > today) {
+            isLocked = true;
+        }
+
+        // Nur als 'completed' anzeigen, wenn NICHT gesperrt
+        // Das verhindert, dass alte Testdaten (z.B. Tag 2 schon offen) das Schloss überschreiben
+        if (completedDays.includes(i) && !isLocked) {
             day.classList.add('completed');
         }
 
-        // Datum prüfen: Ist der Tag schon erlaubt?
-        // Wenn i (Tür-Tag) > today (aktueller Ramadan-Tag), dann SPERREN
-        if (today !== null && i > today) {
+        if (isLocked) {
             day.classList.add('locked');
             day.innerHTML = `<span class="lock-icon">🔒</span><span class="day-num">${i}</span>`;
-            // Kein Click-Event hinzufügen (bzw. Click abfangen)
             day.addEventListener('click', (e) => {
                 e.stopPropagation();
                 showToast(`⏳ Geduld! Diese Tür öffnet sich erst am ${i}. Tag.`);
