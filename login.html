@@ -243,9 +243,14 @@
                     <label>E-Mail Adresse</label>
                     <input type="email" id="email" placeholder="name@beispiel.de" required>
                 </div>
-                <div class="input-group">
+                <div class="input-group" id="passwordGroup">
                     <label>Passwort</label>
-                    <input type="password" id="password" placeholder="Mindestens 6 Zeichen" required minlength="6">
+                    <input type="password" id="password" placeholder="Mindestens 6 Zeichen" minlength="6">
+                </div>
+
+                <div id="forgotPwArea" style="text-align: right; margin-top: -10px; margin-bottom: 20px;">
+                    <button type="button" class="toggle-link" style="font-size: 0.8rem; opacity: 0.8;"
+                        onclick="window.showResetMode()">Passwort vergessen?</button>
                 </div>
 
                 <!-- Datenschutz Checkbox (nur bei Registrierung) -->
@@ -294,15 +299,38 @@
         })();
 
         window.isLoginMode = true;
+        window.isResetMode = false;
+
+        function showResetMode() {
+            window.isResetMode = true;
+            document.getElementById('pageTitle').innerText = 'Passwort vergessen';
+            document.getElementById('pageSubtitle').innerText = 'Gib deine E-Mail ein, um einen Reset-Link zu erhalten.';
+            document.getElementById('submitBtn').innerText = 'Reset-Link senden';
+            document.getElementById('passwordGroup').style.display = 'none';
+            document.getElementById('forgotPwArea').style.display = 'none';
+            document.getElementById('privacyArea').style.display = 'none';
+            document.getElementById('toggleQuestion').innerText = 'Wieder eingefallen?';
+            document.getElementById('toggleBtn').innerText = 'Zum Login';
+        }
 
         function doToggle() {
-            window.isLoginMode = !window.isLoginMode;
+            if (window.isResetMode) {
+                window.isResetMode = false;
+                window.isLoginMode = true;
+            } else {
+                window.isLoginMode = !window.isLoginMode;
+            }
+
             var title = document.getElementById('pageTitle');
             var sub = document.getElementById('pageSubtitle');
             var btn = document.getElementById('submitBtn');
             var q = document.getElementById('toggleQuestion');
             var tLink = document.getElementById('toggleBtn');
             var priv = document.getElementById('privacyArea');
+            var pw = document.getElementById('passwordGroup');
+            var forgot = document.getElementById('forgotPwArea');
+
+            pw.style.display = 'block';
 
             if (window.isLoginMode) {
                 title.innerText = 'Anmelden';
@@ -311,6 +339,7 @@
                 q.innerText = 'Noch kein Konto?';
                 tLink.innerText = 'Hier registrieren';
                 priv.style.display = 'none';
+                forgot.style.display = 'block';
             } else {
                 title.innerText = 'Registrieren';
                 sub.innerText = 'Erstelle ein Konto für deine Familie.';
@@ -318,23 +347,13 @@
                 q.innerText = 'Bereit ein Konto?';
                 tLink.innerText = 'Hier anmelden';
                 priv.style.display = 'flex';
+                forgot.style.display = 'none';
             }
         }
 
         async function handleAuth() {
             console.log("Auth gestartet...");
             if (!window.sb) { alert("Serververbindung fehlt."); return; }
-
-            // Check Privacy for Registration
-            if (!window.isLoginMode) {
-                const checked = document.getElementById('privacyCheck').checked;
-                if (!checked) {
-                    var errBox = document.getElementById('errorMsg');
-                    errBox.innerText = "Bitte akzeptiere die Datenschutzerklärung.";
-                    errBox.style.display = 'block';
-                    return;
-                }
-            }
 
             var email = document.getElementById('email').value;
             var password = document.getElementById('password').value;
@@ -343,9 +362,35 @@
 
             btn.disabled = true;
             btn.innerText = 'Bitte warten...';
-            if (errBox) errBox.style.display = 'none';
+            if (errBox) {
+                errBox.style.display = 'none';
+                errBox.style.background = 'rgba(255, 60, 60, 0.1)';
+                errBox.style.color = '#ff6b6b';
+            }
 
             try {
+                if (window.isResetMode) {
+                    const { error } = await window.sb.auth.resetPasswordForEmail(email, {
+                        redirectTo: window.location.origin + '/index.html',
+                    });
+                    if (error) throw error;
+                    errBox.innerText = "Checke deine E-Mails! Wir haben dir einen Link geschickt.";
+                    errBox.style.background = 'rgba(60, 255, 60, 0.1)';
+                    errBox.style.color = '#6bff6b';
+                    errBox.style.display = 'block';
+                    return;
+                }
+
+                // Check Privacy for Registration
+                if (!window.isLoginMode) {
+                    const checked = document.getElementById('privacyCheck').checked;
+                    if (!checked) {
+                        errBox.innerText = "Bitte akzeptiere die Datenschutzerklärung.";
+                        errBox.style.display = 'block';
+                        return;
+                    }
+                }
+
                 let result;
                 if (window.isLoginMode) {
                     result = await window.sb.auth.signInWithPassword({ email, password });
@@ -365,7 +410,7 @@
                     } else {
                         errBox.innerText = "Konto erstellt! Bitte melde dich jetzt an.";
                         errBox.style.display = 'block';
-                        window.isLoginMode = false; // Trigger toggle back
+                        window.isLoginMode = false;
                         window.doToggle();
                     }
                 }
@@ -377,7 +422,8 @@
                 }
             } finally {
                 btn.disabled = false;
-                btn.innerText = window.isLoginMode ? 'Anmelden' : 'Konto erstellen';
+                if (window.isResetMode) btn.innerText = 'Reset-Link senden';
+                else btn.innerText = window.isLoginMode ? 'Anmelden' : 'Konto erstellen';
             }
         }
     </script>
