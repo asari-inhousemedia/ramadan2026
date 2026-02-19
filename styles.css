@@ -518,8 +518,8 @@ a:hover {
     inset: 0;
     z-index: 1;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(6, 1fr);
+    grid-template-columns: repeat(9, 1fr);
+    grid-template-rows: repeat(10, 1fr);
     gap: 0px;
     /* Keine Lücken, damit nichts durchblitzt */
 }

@@ -20,9 +20,15 @@ try {
 
 // ========== FALLBACK TASKS (used until Supabase table is ready) ==========
 const FALLBACK_TASKS = [
-    { id: 'f1', day: 1, icon: '😊', title: 'Lächeln schenken', task: 'Schenke heute jemandem ein ehrliches Lächeln und sag etwas Nettes.' },
-    { id: 'f2', day: 2, icon: '🤲', title: 'Dua für andere', task: 'Bete heute ein Dua für jemanden, den du liebst.' },
-    { id: 'f3', day: 3, icon: '📖', title: 'Quran lesen', task: 'Lies heute mindestens eine Seite aus dem Quran.' },
+    { id: 'f1-1', day: 1, icon: '👋', title: 'Begrüßung', task: 'Sage „Ramadan Mubarak!" oder „Hayırlı Ramazanlar!" zu jedem in deiner Familie.' },
+    { id: 'f1-2', day: 1, icon: '🧠', title: 'Verstehen', task: 'Frage deine Eltern: „Warum fasten Muslime im Ramadan?" und hör gut zu.' },
+    { id: 'f1-3', day: 1, icon: '❤️', title: 'Herzensaufgabe', task: 'Male ein Bild oder zeichne etwas, auf das du dich im Ramadan freust.' },
+    { id: 'f2-1', day: 2, icon: '🤝', title: 'Helfen', task: 'Hilf beim Tischdecken für das Iftar-Essen.' },
+    { id: 'f2-2', day: 2, icon: '🌙', title: 'Freundlichkeit', task: 'Sage heute mindestens 3 Mal „Danke" – ohne dass jemand dich daran erinnert.' },
+    { id: 'f2-3', day: 2, icon: '🌙', title: 'Aufmerksamkeit', task: 'Frage jemanden in der Familie: „Kann ich dir helfen?"' },
+    { id: 'f3-1', day: 3, icon: '🧠', title: 'Nachdenken', task: 'Denke an 3 Dinge, für die du heute dankbar bist – erzähle sie deinen Eltern.' },
+    { id: 'f3-2', day: 3, icon: '🙏', title: 'Dankeschön sagen', task: 'Bedanke dich bei jemandem, dem du noch nie richtig „Danke" gesagt hast.' },
+    { id: 'f3-3', day: 3, icon: '🧠', title: 'Vergleichen', task: 'Sprecht in der Familie darüber: Was haben wir, das andere nicht haben?' },
     { id: 'f4', day: 4, icon: '🍽️', title: 'Essen teilen', task: 'Teile heute dein Essen mit einem Nachbarn oder Freund.' },
     { id: 'f5', day: 5, icon: '🧹', title: 'Helfen im Haushalt', task: 'Hilf heute ohne gefragt zu werden im Haushalt mit.' },
     { id: 'f6', day: 6, icon: '💌', title: 'Brief schreiben', task: 'Schreibe einen lieben Brief oder eine Nachricht an jemanden.' },
@@ -55,8 +61,8 @@ const FALLBACK_TASKS = [
 // ========== STATE ==========
 let dailyTasks = [...FALLBACK_TASKS]; // Will be replaced by Supabase data
 let completedTasks = []; // UUIDs of completed tasks
-let revealedTiles = []; // Day numbers that have unlocked a tile
-let tileMapping = []; // tileMapping[doorIndex] = tileIndex (random shuffle)
+let revealedTiles = []; // Task IDs (or indices) that have unlocked a tile
+let tileMapping = []; // Mapping for 90 tasks
 let currentChild = null;
 let childrenData = [];
 let allProgressData = []; // Cache for all children's scores
@@ -185,15 +191,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     familyId = session.user.id;
     console.log('[Auth] User session found:', familyId);
 
-    // FIX: Initialize tile mapping based on the authenticated user ID
+    // FIX: Initialize tile mapping for 90 tasks
     const seed = seedFromId(familyId);
-    const indices = Array.from({ length: 30 }, (_, i) => i);
+    const indices = Array.from({ length: 90 }, (_, i) => i);
     tileMapping = seededShuffle(indices, seed);
-    console.log('[Ramadan] Tile mapping initialized.');
+    console.log('[Ramadan] Tile mapping (90) initialized.');
 
     registerServiceWorker();
     createFloatingSymbols();
     startShootingStars();
+    setupModal();
+
+    // Logout Listener
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
 
     showLoading(true);
 
@@ -206,14 +217,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         buildMosaicGrid();
         buildCalendarGrid();
-        setupModal();
         updateTilesCounter();
-
-        // Logout Listener
-        const logoutBtn = document.getElementById('logoutBtn');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', handleLogout);
-        }
     } catch (err) {
         console.error('[Ramadan] Initialization error:', err);
     } finally {
@@ -452,13 +456,13 @@ async function loadChildProgress(childName) {
     }
 }
 
-// ========== MOSAIC GRID ==========
+// ========== MOSAIC GRID (90 Tiles) ==========
 function buildMosaicGrid() {
     const grid = document.getElementById('mosaicGrid');
     if (!grid) return;
     grid.innerHTML = '';
 
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 90; i++) {
         const tile = document.createElement('div');
         tile.className = 'mosaic-tile';
         tile.id = `mosaic-tile-${i}`;
@@ -587,16 +591,19 @@ function setupModal() {
     const doneBtn = document.getElementById('modalDoneBtn');
 
     if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (doneBtn) {
+        doneBtn.addEventListener('click', closeModal);
+        doneBtn.style.display = 'block';
+    }
     if (overlay) overlay.addEventListener('click', (e) => {
         if (e.target === overlay) closeModal();
     });
-
-    if (doneBtn) doneBtn.style.display = 'none'; // We use individual buttons now
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeModal();
     });
 }
+window.setupModal = setupModal;
 
 function openModal(dayNum) {
     const tasksForDay = dailyTasks.filter(t => t.day === dayNum);
@@ -613,7 +620,7 @@ function openModal(dayNum) {
     taskContainer.innerHTML = '';
 
     tasksForDay.forEach(taskData => {
-        const isDone = completedTasks.includes(taskData.id); // Check by task ID
+        const isDone = completedTasks.includes(taskData.id);
 
         const taskEl = document.createElement('div');
         taskEl.className = 'modal-task-item';
@@ -632,7 +639,7 @@ function openModal(dayNum) {
                 ${isDone ? '<span style="color:#2ecc71; font-weight:700;">✅</span>' : ''}
             </div>
             <p style="margin:8px 0 12px 0; font-size:0.95rem; color:var(--modal-text-secondary); line-height:1.4;">${sanitize(taskData.task)}</p>
-            ${!isDone ? `<button class="modal-btn-small" onclick="markTaskCompleted('${taskData.id}', ${dayNum})" style="
+            ${!isDone ? `<button class="modal-btn-small" onclick="window.markTaskCompleted('${taskData.id}', ${dayNum})" style="
                 background: var(--gold-primary);
                 color: white;
                 border: none;
@@ -646,30 +653,47 @@ function openModal(dayNum) {
         taskContainer.appendChild(taskEl);
     });
 
+    // Update main button text if all tasks are done
+    const allDone = tasksForDay.every(t => completedTasks.includes(t.id));
+    const doneBtn = document.getElementById('modalDoneBtn');
+    if (doneBtn) {
+        doneBtn.textContent = allDone ? 'Super gemacht! 🌙' : 'Ich hab\'s geschafft! ✨';
+    }
+
     overlay.classList.add('active');
     document.body.style.overflow = 'hidden';
 }
+
+function closeModal() {
+    const overlay = document.getElementById('modalOverlay');
+    if (overlay) overlay.classList.remove('active');
+    document.body.style.overflow = '';
+}
+window.closeModal = closeModal;
 
 async function markTaskCompleted(taskId, dayNum) {
     if (completedTasks.includes(taskId)) return;
 
     completedTasks.push(taskId);
 
-    // Check if this is the first task completed for this day
-    const tasksForDay = dailyTasks.filter(t => t.day === dayNum);
-    const previouslyCompletedTasksForDay = tasksForDay.filter(t => completedTasks.includes(t.id) && t.id !== taskId);
+    // Reveal a unique tile for EVERY task
+    // Find the global index of this task in the 90 tasks list
+    const taskIndex = dailyTasks.findIndex(t => t.id === taskId);
+    if (taskIndex !== -1 && !revealedTiles.includes(taskIndex)) {
+        revealRandomTile(taskIndex);
+    }
 
-    if (previouslyCompletedTasksForDay.length === 0) { // If this is the first task for the day being completed
-        // Reveal random mosaic tile ONLY if it's the first task of this day
-        if (!revealedTiles.includes(dayNum)) {
-            revealRandomTile(dayNum);
-            // Update calendar tile visually
-            const calDay = document.getElementById(`calendar-day-${dayNum}`);
-            if (calDay) {
-                calDay.classList.add('completed');
-                calDay.innerHTML = `<span class="star-icon">⭐</span><span class="day-num">${dayNum}</span>`;
-            }
-        }
+    // Check if the daily door should show a star (if at least one task is done)
+    const tasksForDay = dailyTasks.filter(t => t.day === dayNum);
+    const completedForDay = tasksForDay.filter(t => completedTasks.includes(t.id));
+
+    const calDay = document.getElementById(`calendar-day-${dayNum}`);
+    if (calDay && completedForDay.length > 0) {
+        calDay.classList.add('completed');
+        // Show how many stars (1-3)
+        let stars = '';
+        for (let s = 0; s < completedForDay.length; s++) stars += '⭐';
+        calDay.innerHTML = `<span class="star-icon">${stars}</span><span class="day-num">${dayNum}</span>`;
     }
 
     // Confetti
@@ -690,13 +714,13 @@ async function markTaskCompleted(taskId, dayNum) {
     }
 }
 
-// ========== REVEAL TILE (Random Mapping) ==========
-function revealRandomTile(dayNum) {
-    if (revealedTiles.includes(dayNum)) return;
+// ========== REVEAL TILE (90-Tile System) ==========
+function revealRandomTile(taskIdx) {
+    if (revealedTiles.includes(taskIdx)) return;
 
-    // Mapping: which day (1-30) reveals which tile (0-29)
-    const tileIndex = tileMapping[dayNum - 1];
-    revealedTiles.push(dayNum);
+    // Use tileMapping to find which physical tile (0-89) to reveal
+    const tileIndex = tileMapping[taskIdx];
+    revealedTiles.push(taskIdx);
 
     const tile = document.getElementById(`mosaic-tile-${tileIndex}`);
     if (tile) {
@@ -710,12 +734,15 @@ function revealRandomTile(dayNum) {
     updateTilesCounter();
     updateImageBlur();
 }
+window.revealRandomTile = revealRandomTile;
+window.markTaskCompleted = markTaskCompleted;
+window.handleLogout = handleLogout;
 
 // ========== UPDATE TILES COUNTER ==========
 function updateTilesCounter() {
     const el = document.getElementById('tilesLeft');
     if (el) {
-        const left = 30 - revealedTiles.length;
+        const left = 90 - revealedTiles.length;
         el.textContent = left;
     }
 }

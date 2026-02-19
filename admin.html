@@ -76,36 +76,17 @@
 
         // Fallback tasks (same as main script)
         const FALLBACK_TASKS = [
-            { day: 1, icon: '😊', title: 'Lächeln schenken', task: 'Schenke heute jemandem ein ehrliches Lächeln und sag etwas Nettes.' },
-            { day: 2, icon: '🤲', title: 'Dua für andere', task: 'Bete heute ein Dua für jemanden, den du liebst.' },
-            { day: 3, icon: '📖', title: 'Quran lesen', task: 'Lies heute mindestens eine Seite aus dem Quran.' },
-            { day: 4, icon: '🍽️', title: 'Essen teilen', task: 'Teile heute dein Essen mit einem Nachbarn oder Freund.' },
-            { day: 5, icon: '🧹', title: 'Helfen im Haushalt', task: 'Hilf heute ohne gefragt zu werden im Haushalt mit.' },
-            { day: 6, icon: '💌', title: 'Brief schreiben', task: 'Schreibe einen lieben Brief oder eine Nachricht an jemanden.' },
-            { day: 7, icon: '🌳', title: 'Natur genießen', task: 'Gehe heute nach draußen und danke Allah für die Natur.' },
-            { day: 8, icon: '🤝', title: 'Versöhnung', task: 'Versöhne dich heute mit jemandem, mit dem du im Streit warst.' },
-            { day: 9, icon: '💰', title: 'Spenden', task: 'Spende heute etwas – egal wie klein – für einen guten Zweck.' },
-            { day: 10, icon: '🧸', title: 'Spielzeug verschenken', task: 'Verschenke ein Spielzeug, das du nicht mehr brauchst.' },
-            { day: 11, icon: '🕌', title: 'Moschee besuchen', task: 'Besuche heute die Moschee für ein gemeinsames Gebet.' },
-            { day: 12, icon: '👴', title: 'Ältere besuchen', task: 'Besuche oder rufe heute Oma, Opa oder ältere Nachbarn an.' },
-            { day: 13, icon: '🎨', title: 'Kreativ sein', task: 'Male ein schönes Bild zum Thema Ramadan.' },
-            { day: 14, icon: '🙏', title: 'Extra Gebet', task: 'Bete heute ein zusätzliches freiwilliges Gebet.' },
-            { day: 15, icon: '📚', title: 'Geschichte lernen', task: 'Lerne heute eine Geschichte über einen Propheten.' },
-            { day: 16, icon: '🥤', title: 'Wasser schätzen', task: 'Denke heute beim Trinken daran, wie wertvoll Wasser ist.' },
-            { day: 17, icon: '🌙', title: 'Nachtgebet', task: 'Versuche heute Nacht aufzustehen und ein kurzes Gebet zu sprechen.' },
-            { day: 18, icon: '👨‍👩‍👧‍👦', title: 'Familie', task: 'Verbringe heute bewusst Zeit mit deiner Familie.' },
-            { day: 19, icon: '🍪', title: 'Backen', task: 'Backe heute Kekse oder Kuchen und teile sie mit anderen.' },
-            { day: 20, icon: '🗑️', title: 'Aufräumen', task: 'Räume heute dein Zimmer gründlich auf und halte es sauber.' },
-            { day: 21, icon: '🤫', title: 'Geduld üben', task: 'Übe heute besonders viel Geduld – auch wenn es schwer fällt.' },
-            { day: 22, icon: '🎁', title: 'Überraschung', task: 'Überrasche heute jemanden mit einer kleinen Freude.' },
-            { day: 23, icon: '💧', title: 'Dhikr machen', task: 'Sage heute 100 Mal "SubhanAllah" über den Tag verteilt.' },
-            { day: 24, icon: '🌟', title: 'Vorbild sein', task: 'Sei heute ein gutes Vorbild für andere Kinder.' },
-            { day: 25, icon: '📿', title: 'Dankbarkeit', task: 'Schreibe 5 Dinge auf, für die du heute dankbar bist.' },
-            { day: 26, icon: '🕊️', title: 'Frieden stiften', task: 'Hilf heute dabei, einen Streit zwischen anderen zu schlichten.' },
-            { day: 27, icon: '✨', title: 'Lailat al-Qadr', task: 'Heute könnte die Nacht der Bestimmung sein – bete besonders viel!' },
-            { day: 28, icon: '🧕', title: 'Eltern ehren', task: 'Sage heute deinen Eltern, wie sehr du sie liebst.' },
-            { day: 29, icon: '🌅', title: 'Sonnenaufgang', task: 'Stehe heute früh auf und beobachte den Sonnenaufgang.' },
-            { day: 30, icon: '🎉', title: 'Bayram-Vorfreude', task: 'Bereite dich heute auf das Bayram-Fest vor – dein Geschenk wartet! 🎁' }
+            { id: 'f1-1', day: 1, icon: '👋', title: 'Begrüßung', task: 'Sage „Ramadan Mubarak!" oder „Hayırlı Ramazanlar!" zu jedem in deiner Familie.' },
+            { id: 'f1-2', day: 1, icon: '🧠', title: 'Verstehen', task: 'Frage deine Eltern: „Warum fasten Muslime im Ramadan?" und hör gut zu.' },
+            { id: 'f1-3', day: 1, icon: '❤️', title: 'Herzensaufgabe', task: 'Male ein Bild oder zeichne etwas, auf das du dich im Ramadan freust.' },
+            { id: 'f2-1', day: 2, icon: '🤝', title: 'Helfen', task: 'Hilf beim Tischdecken für das Iftar-Essen.' },
+            { id: 'f2-2', day: 2, icon: '🌙', title: 'Freundlichkeit', task: 'Sage heute mindestens 3 Mal „Danke" – ohne dass jemand dich daran erinnert.' },
+            { id: 'f2-3', day: 2, icon: '🌙', title: 'Aufmerksamkeit', task: 'Frage jemanden in der Familie: „Kann ich dir helfen?"' },
+            { id: 'f3-1', day: 3, icon: '🧠', title: 'Nachdenken', task: 'Denke an 3 Dinge, für die du heute dankbar bist – erzähle sie deinen Eltern.' },
+            { id: 'f3-2', day: 3, icon: '🙏', title: 'Dankeschön sagen', task: 'Bedanke dich bei jemandem, dem du noch nie richtig „Danke" gesagt hast.' },
+            { id: 'f3-3', day: 3, icon: '🧠', title: 'Vergleichen', task: 'Sprecht in der Familie darüber: Was haben wir, das andere nicht haben?' },
+            { id: 'f4', day: 4, icon: '🍽️', title: 'Essen teilen', task: 'Teile heute dein Essen mit einem Nachbarn oder Freund.' },
+            { id: 'f5', day: 5, icon: '🧹', title: 'Helfen im Haushalt', task: 'Hilf heute ohne gefragt zu werden im Haushalt mit.' }
         ];
 
         // ========== PASSWORD CHECK ==========
