@@ -423,8 +423,10 @@ a:hover {
     aspect-ratio: 5 / 6;
     border-radius: var(--radius-md);
     overflow: hidden;
-    border: 2px dashed rgba(180, 200, 255, 0.25);
+    border: 2px solid rgba(180, 200, 255, 0.25);
     box-shadow: var(--shadow-deep);
+    background: #0d1535;
+    /* Verhindert das Durchblitzen des Hintergrunds */
 }
 
 .mosaic-image {
