@@ -9,18 +9,17 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Outfit:wght@300;400;600;700;800&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=1.0.6">
+    <link rel="stylesheet" href="styles.css?v=1.0.9">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
     <script>
-        // Diese Funktion MUSS im Head stehen, damit sie sofort bereit ist
-        var isLoginMode = true;
+        // GLOBAL STATE
+        window.isLoginMode = true;
+        window.sb = null; // Wir nennen die Variable 'sb' um Konflikte zu vermeiden
 
         function doToggle() {
-            // DEBUG: Damit wir sehen ob der Klick ankommt
-            console.log("Toggle-Funktion wurde aufgerufen");
-
-            isLoginMode = !isLoginMode;
+            window.isLoginMode = !window.isLoginMode;
+            console.log("Modus gewechselt. Login:", window.isLoginMode);
 
             var title = document.getElementById('pageTitle');
             var sub = document.getElementById('pageSubtitle');
@@ -31,7 +30,7 @@
 
             if (err) err.style.display = 'none';
 
-            if (isLoginMode) {
+            if (window.isLoginMode) {
                 if (title) title.innerText = 'Anmelden';
                 if (sub) sub.innerText = 'Melde dich an, um den Kalender zu nutzen.';
                 if (btn) btn.innerText = 'Anmelden';
@@ -50,11 +49,9 @@
     <style>
         body {
             margin: 0;
-            padding: 0;
             background: #0d1535;
             font-family: 'Outfit', sans-serif;
             color: #fff;
-            overflow-x: hidden;
         }
 
         .login-container {
@@ -63,8 +60,6 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
-            position: relative;
-            z-index: 10;
         }
 
         .login-card {
@@ -126,11 +121,6 @@
             font-weight: 800;
             font-size: 1.1rem;
             cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .auth-btn:active {
-            transform: scale(0.98);
         }
 
         .toggle-area {
@@ -149,7 +139,6 @@
             padding: 10px;
             font-family: inherit;
             font-size: 1rem;
-            display: inline-block;
         }
 
         .error-msg {
@@ -177,22 +166,18 @@
     <div class="login-container">
         <div class="login-card">
             <div style="font-size: 3rem; margin-bottom: 20px;">🌙</div>
-
             <h1 id="pageTitle">Anmelden</h1>
             <p id="pageSubtitle">Melde dich an, um den Kalender zu nutzen.</p>
 
-            <form id="authForm" onsubmit="event.preventDefault(); handleAuth();">
+            <form id="authForm" onsubmit="event.preventDefault(); window.handleAuth();">
                 <div class="input-group">
                     <label>E-Mail Adresse</label>
-                    <input type="email" id="email" placeholder="name@beispiel.de" required autocomplete="email">
+                    <input type="email" id="email" placeholder="name@beispiel.de" required>
                 </div>
-
                 <div class="input-group">
                     <label>Passwort</label>
-                    <input type="password" id="password" placeholder="Mindestens 6 Zeichen" required minlength="6"
-                        autocomplete="current-password">
+                    <input type="password" id="password" placeholder="Mindestens 6 Zeichen" required minlength="6">
                 </div>
-
                 <button type="submit" class="auth-btn" id="submitBtn">Anmelden</button>
                 <div id="errorMsg" class="error-msg"></div>
             </form>
@@ -207,82 +192,64 @@
         </div>
     </div>
 
-    <div class="ver-tag">v1.0.8</div>
+    <div class="ver-tag">v1.0.9</div>
 
     <script>
         // Supabase Initialization
-        let supabase;
-        try {
-            const SUPABASE_URL = 'https://thscbzyzblpqwbskymbg.supabase.co';
-            const SUPABASE_KEY = 'sb_publishable_w4wZcJW_TOnzxlgr-kMr5Q_aCu8OxTz';
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            console.log("Supabase Client geladen");
-        } catch (e) { console.error("Supabase Error:", e); }
+        (function () {
+            try {
+                const URL = 'https://thscbzyzblpqwbskymbg.supabase.co';
+                const KEY = 'sb_publishable_w4wZcJW_TOnzxlgr-kMr5Q_aCu8OxTz';
+                window.sb = window.supabase.createClient(URL, KEY);
+                console.log("Supabase bereit (v1.0.9)");
+            } catch (e) { console.error("Supabase Error:", e); }
+        })();
 
         async function handleAuth() {
-            console.log("handleAuth gestartet. Modus: " + (isLoginMode ? "Login" : "Register"));
-
-            if (!supabase) {
-                alert("Verbindung fehlgeschlagen. Bitte Seite neu laden.");
-                return;
-            }
+            console.log("Auth gestartet...");
+            if (!window.sb) { alert("Serververbindung fehlt."); return; }
 
             var email = document.getElementById('email').value;
             var password = document.getElementById('password').value;
             var btn = document.getElementById('submitBtn');
             var errBox = document.getElementById('errorMsg');
 
-            if (!email || !password) {
-                alert("Bitte E-Mail und Passwort eingeben");
-                return;
-            }
-
             btn.disabled = true;
-            btn.innerText = 'Wird verarbeitet...';
+            btn.innerText = 'Bitte warten...';
             if (errBox) errBox.style.display = 'none';
 
             try {
                 let result;
-                if (isLoginMode) {
-                    console.log("Sende Login-Anfrage für: " + email);
-                    result = await supabase.auth.signInWithPassword({ email: email, password: password });
+                if (window.isLoginMode) {
+                    result = await window.sb.auth.signInWithPassword({ email, password });
                 } else {
-                    console.log("Sende Registrierungs-Anfrage für: " + email);
-                    result = await supabase.auth.signUp({ email: email, password: password });
+                    result = await window.sb.auth.signUp({ email, password });
                 }
-
-                console.log("Antwort von Supabase erhalten:", result);
 
                 if (result.error) throw result.error;
 
                 if (result.data && result.data.session) {
-                    console.log("Erfolg! Session vorhanden. Leite weiter...");
                     window.location.href = 'index.html';
-                } else if (!isLoginMode) {
-                    console.log("Registrierung erfolgreich, versuche Auto-Login...");
-                    // Automatischer Login nach Registration
-                    const retry = await supabase.auth.signInWithPassword({ email: email, password: password });
+                } else if (!window.isLoginMode) {
+                    // Automatischer Login-Versuch
+                    const retry = await window.sb.auth.signInWithPassword({ email, password });
                     if (retry.data && retry.data.session) {
                         window.location.href = 'index.html';
                     } else {
-                        errBox.innerText = "Konto erstellt! Bitte melde dich jetzt mit deinen Daten an.";
+                        errBox.innerText = "Konto erstellt! Bitte melde dich jetzt an.";
                         errBox.style.display = 'block';
-                        btn.disabled = false;
-                        btn.innerText = 'Anmelden';
-                        doToggle(); // Zurück zum Login-Modus
+                        window.doToggle();
                     }
-                } else {
-                    throw new Error("Login fehlgeschlagen. Bitte prüfe deine Daten.");
                 }
             } catch (error) {
-                console.error("Fehler bei der Authentifizierung:", error);
+                console.error("Auth Fehler:", error);
                 if (errBox) {
-                    errBox.innerText = "Fehler: " + (error.message || "Unbekannter Fehler");
+                    errBox.innerText = error.message;
                     errBox.style.display = 'block';
                 }
             } finally {
                 btn.disabled = false;
-                btn.innerText = isLoginMode ? 'Anmelden' : 'Konto erstellen';
+                btn.innerText = window.isLoginMode ? 'Anmelden' : 'Konto erstellen';
             }
         }
     </script>
