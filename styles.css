@@ -501,7 +501,8 @@ a:hover {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     grid-template-rows: repeat(6, 1fr);
-    gap: 2px;
+    gap: 0px;
+    /* Keine Lücken, damit nichts durchblitzt */
 }
 
 /* Mosaic Tile */
@@ -1130,6 +1131,7 @@ a:hover {
     transition: border-color var(--transition-fast);
     outline: none;
     -webkit-appearance: none;
+    appearance: none;
 }
 
 .form-input:focus {
