@@ -78,7 +78,7 @@ function sanitize(str) {
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#x27;')
         .trim()
-        .slice(0, 100);
+        .slice(0, 2000);
 }
 
 function generateUUID() {

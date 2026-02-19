@@ -835,6 +835,9 @@ a:hover {
     transform: scale(0.85) translateY(25px);
     transition: transform var(--transition-med);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 50px rgba(212, 168, 67, 0.1);
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
     overflow: hidden;
     position: relative;
 }
@@ -846,6 +849,7 @@ a:hover {
 .modal-header {
     padding: 22px 22px 10px;
     text-align: center;
+    flex-shrink: 0;
 }
 
 .modal-day-badge {
@@ -882,6 +886,10 @@ a:hover {
 .modal-body {
     padding: 14px 24px 18px;
     text-align: center;
+    overflow-y: auto;
+    flex: 1;
+    -webkit-overflow-scrolling: touch;
+    /* Smooth scrolling on iOS */
 }
 
 .modal-title {
@@ -901,6 +909,7 @@ a:hover {
 .modal-footer {
     padding: 0 24px 22px;
     text-align: center;
+    flex-shrink: 0;
 }
 
 .modal-btn {
