@@ -222,44 +222,30 @@
 
         let isLoginMode = true;
 
-        // UI Elements
-        const toggleBtn = document.getElementById('toggleBtn');
-        const authForm = document.getElementById('authForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const errorMsg = document.getElementById('errorMsg');
-        const pageTitle = document.getElementById('pageTitle');
-        const pageSubtitle = document.getElementById('pageSubtitle');
-        const toggleQuestion = document.getElementById('toggleQuestion');
-
-        // 1. EVENT LISTENERS SOFORT REGISTRIEREN (Noch vor DOMContentLoaded)
-        if (toggleBtn) {
-            toggleBtn.onclick = (e) => {
+        // 1. GLOBAL CLICK HANDLER (Event Delegation) - Bulletproof!
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'toggleBtn') {
                 e.preventDefault();
                 toggleMode();
-            };
-        }
-
-        if (authForm) {
-            authForm.onsubmit = (e) => {
-                e.preventDefault();
-                handleAuth();
-            };
-        }
+            }
+        });
 
         // 2. INITIALISIERUNG
         document.addEventListener('DOMContentLoaded', async () => {
-            console.log('[Auth] Login Page Ready');
+            console.log('[Auth] Login Page Initialized');
+
+            const authForm = document.getElementById('authForm');
+            if (authForm) {
+                authForm.onsubmit = (e) => {
+                    e.preventDefault();
+                    handleAuth();
+                };
+            }
 
             // Check if file://
             if (window.location.protocol === 'file:') {
                 showError('⚠️ App läuft über "file://". Bitte nutze einen Webserver (z.B. Live Server), sonst wird der Login blockiert!');
             }
-
-            // Test Supabase Connection (Silent)
-            try {
-                const { error } = await supabase.from('daily_tasks').select('id').limit(1);
-                if (error) console.warn('[Supabase] Connection test warning:', error);
-            } catch (e) { }
 
             // Session Check
             try {
@@ -270,32 +256,46 @@
 
         function toggleMode() {
             isLoginMode = !isLoginMode;
-            console.log('[Auth] Mode changed. isLoginMode:', isLoginMode);
+            console.log('[Auth] Toggle Mode. isLoginMode:', isLoginMode);
 
-            errorMsg.style.display = 'none';
+            const pageTitle = document.getElementById('pageTitle');
+            const pageSubtitle = document.getElementById('pageSubtitle');
+            const submitBtn = document.getElementById('submitBtn');
+            const toggleQuestion = document.getElementById('toggleQuestion');
+            const toggleBtn = document.getElementById('toggleBtn');
+            const errorMsg = document.getElementById('errorMsg');
+
+            if (errorMsg) errorMsg.style.display = 'none';
 
             if (isLoginMode) {
-                pageTitle.textContent = 'Anmelden';
-                pageSubtitle.textContent = 'Willkommen zurück! Melde dich an, um deinen Fortschritt zu sehen.';
-                submitBtn.textContent = 'Anmelden';
-                toggleQuestion.textContent = 'Noch kein Konto?';
-                toggleBtn.textContent = 'Hier registrieren';
+                if (pageTitle) pageTitle.textContent = 'Anmelden';
+                if (pageSubtitle) pageSubtitle.textContent = 'Willkommen zurück! Melde dich an, um deinen Fortschritt zu sehen.';
+                if (submitBtn) submitBtn.textContent = 'Anmelden';
+                if (toggleQuestion) toggleQuestion.textContent = 'Noch kein Konto?';
+                if (toggleBtn) toggleBtn.textContent = 'Hier registrieren';
             } else {
-                pageTitle.textContent = 'Registrieren';
-                pageSubtitle.textContent = 'Erstelle ein kostenloses Konto für deine Familie (dauert nur 10 Sekunden).';
-                submitBtn.textContent = 'Konto erstellen';
-                toggleQuestion.textContent = 'Schon registriert?';
-                toggleBtn.textContent = 'Hier anmelden';
+                if (pageTitle) pageTitle.textContent = 'Registrieren';
+                if (pageSubtitle) pageSubtitle.textContent = 'Erstelle ein kostenloses Konto für deine Familie (dauert nur 10 Sekunden).';
+                if (submitBtn) submitBtn.textContent = 'Konto erstellen';
+                if (toggleQuestion) toggleQuestion.textContent = 'Schon registriert?';
+                if (toggleBtn) toggleBtn.textContent = 'Hier anmelden';
             }
         }
 
         async function handleAuth() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const submitBtn = document.getElementById('submitBtn');
+            const errorMsg = document.getElementById('errorMsg');
+
+            if (!emailInput || !passwordInput || !submitBtn) return;
+
+            const email = emailInput.value;
+            const password = passwordInput.value;
 
             submitBtn.disabled = true;
             submitBtn.textContent = 'Wird verarbeitet...';
-            errorMsg.style.display = 'none';
+            if (errorMsg) errorMsg.style.display = 'none';
 
             try {
                 let result;
@@ -314,8 +314,8 @@
                 if (result.data.session) {
                     window.location.href = 'index.html';
                 } else if (!isLoginMode) {
+                    // Falls account erstellt wurde aber session nicht sofort da ist
                     showError('Konto erstellt! Du wirst jetzt automatisch eingeloggt...');
-                    // Fallback: Manchmal braucht Supabase kurz
                     setTimeout(() => window.location.href = 'index.html', 1500);
                 }
             } catch (error) {
@@ -326,14 +326,19 @@
                 if (msg.includes('Password should be')) msg = 'Passwort muss mindestens 6 Zeichen haben.';
                 showError(msg);
             } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = isLoginMode ? 'Anmelden' : 'Konto erstellen';
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = isLoginMode ? 'Anmelden' : 'Konto erstellen';
+                }
             }
         }
 
         function showError(msg) {
-            errorMsg.textContent = msg;
-            errorMsg.style.display = 'block';
+            const errorMsg = document.getElementById('errorMsg');
+            if (errorMsg) {
+                errorMsg.textContent = msg;
+                errorMsg.style.display = 'block';
+            }
         }
     </script>
 </body>
