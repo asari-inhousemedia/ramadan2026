@@ -448,8 +448,16 @@ async function loadChildProgress(childName) {
     const key = `ramadan_completed_tasks_${safeName}`; // Updated key
     const revKey = `ramadan_revealed_${safeName}`;
     try {
-        completedTasks = JSON.parse(localStorage.getItem(key) || '[]'); // Updated property
+        completedTasks = JSON.parse(localStorage.getItem(key) || '[]');
         revealedTiles = JSON.parse(localStorage.getItem(revKey) || '[]');
+
+        // Sync local cache
+        const idx = allProgressData.findIndex(p => p.child_name === safeName);
+        if (idx !== -1) {
+            allProgressData[idx].completed_tasks = completedTasks;
+        } else {
+            allProgressData.push({ child_name: safeName, completed_tasks: completedTasks });
+        }
     } catch (e) {
         completedTasks = []; // Updated property
         revealedTiles = [];
@@ -701,6 +709,16 @@ async function markTaskCompleted(taskId, dayNum) {
 
     // Save progress
     await saveProgress();
+
+    // Update local score cache for tabs
+    if (currentChild) {
+        const idx = allProgressData.findIndex(p => p.child_name === currentChild.name);
+        if (idx !== -1) {
+            allProgressData[idx].completed_tasks = [...completedTasks];
+        } else {
+            allProgressData.push({ child_name: currentChild.name, completed_tasks: [...completedTasks] });
+        }
+    }
 
     // Update UI
     renderChildTabs();
