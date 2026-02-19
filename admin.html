@@ -111,7 +111,8 @@
         // ========== PASSWORD CHECK ==========
         function checkPassword() {
             const input = document.getElementById('adminPassword').value;
-            if (input === ADMIN_PASSWORD_HASH) {
+            if (input === ADMIN_PASSWORD || sessionStorage.getItem('admin_auth') === 'true') {
+                sessionStorage.setItem('admin_auth', 'true');
                 document.getElementById('adminLogin').style.display = 'none';
                 document.getElementById('adminContent').style.display = 'block';
                 loadAdminData();
@@ -122,14 +123,18 @@
             }
         }
 
-        // Allow Enter key
+        // Check if already authenticated via session
         document.addEventListener('DOMContentLoaded', () => {
-            const pwInput = document.getElementById('adminPassword');
-            if (pwInput) {
-                pwInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') checkPassword();
-                });
-                pwInput.focus();
+            if (sessionStorage.getItem('admin_auth') === 'true') {
+                checkPassword();
+            } else {
+                const pwInput = document.getElementById('adminPassword');
+                if (pwInput) {
+                    pwInput.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') checkPassword();
+                    });
+                    pwInput.focus();
+                }
             }
         });
 

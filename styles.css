@@ -2024,3 +2024,70 @@ a:hover {
     border-width: 1.5px !important;
     border-style: solid;
 }
+
+/* ========== INFO NAVIGATION BUTTONS ========== */
+.info-nav-section {
+    display: flex;
+    gap: 16px;
+    margin: 40px auto;
+    max-width: 600px;
+    padding: 0 20px;
+}
+
+.info-nav-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: rgba(13, 21, 53, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(212, 168, 67, 0.2);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+}
+
+.info-nav-btn:hover {
+    transform: translateY(-3px);
+    background: rgba(26, 37, 96, 0.6);
+    border-color: var(--gold-primary);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.info-nav-btn .btn-icon {
+    font-size: 1.8rem;
+}
+
+.info-nav-btn .btn-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-nav-btn .btn-label {
+    color: var(--gold-light);
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.info-nav-btn .btn-sub {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+@media (max-width: 480px) {
+    .info-nav-section {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .info-nav-btn {
+        padding: 14px;
+    }
+
+    .info-nav-btn .btn-icon {
+        font-size: 1.5rem;
+    }
+}
