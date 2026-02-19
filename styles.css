@@ -696,20 +696,36 @@ a:hover {
 }
 
 .calendar-day.completed {
-    border-color: var(--completed-border);
-    box-shadow: 0 0 12px rgba(61, 232, 160, 0.2);
-    background: var(--completed-bg);
-    color: var(--completed-border);
+    border-color: var(--gold-primary);
+    box-shadow: 0 0 15px rgba(245, 200, 66, 0.3);
+    background: rgba(26, 37, 96, 0.6);
+    color: var(--gold-light);
 }
 
-.calendar-day.completed::after {
-    content: '✓';
+.calendar-day.completed .star-icon {
     position: absolute;
-    top: 2px;
-    right: 4px;
-    font-size: 0.5rem;
-    color: var(--completed-border);
-    font-family: var(--font-body);
+    top: -8px;
+    right: -8px;
+    font-size: 1.2rem;
+    filter: drop-shadow(0 0 5px rgba(245, 200, 66, 0.6));
+    animation: starPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes starPop {
+    from {
+        transform: scale(0) rotate(-45deg);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1) rotate(0);
+        opacity: 1;
+    }
+}
+
+.calendar-day.completed .day-num {
+    position: relative;
+    z-index: 1;
 }
 
 .calendar-day.today {
@@ -1200,23 +1216,39 @@ a:hover {
 }
 
 .child-remove-btn {
-    background: none;
-    border: 1px solid rgba(255, 107, 107, 0.3);
-    color: #ff6b6b;
-    width: 28px;
-    height: 28px;
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    z-index: 100;
+    background: #ff4757;
+    border: 2px solid #fff;
+    color: #fff;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all var(--transition-fast);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    pointer-events: auto !important;
 }
 
 .child-remove-btn:hover {
-    background: rgba(255, 107, 107, 0.12);
-    border-color: #ff6b6b;
+    background: #ff6b81;
+    transform: scale(1.1);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+}
+
+.child-card-header {
+    position: relative;
+    /* Wichtig für absolutes Button-Positioning */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
 }
 
 .file-upload {

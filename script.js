@@ -492,6 +492,7 @@ function buildCalendarGrid() {
         // Das verhindert, dass alte Testdaten (z.B. Tag 2 schon offen) das Schloss überschreiben
         if (completedDays.includes(i) && !isLocked) {
             day.classList.add('completed');
+            day.innerHTML = `<span class="star-icon">⭐</span><span class="day-num">${i}</span>`;
         }
 
         if (isLocked) {

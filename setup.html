@@ -242,7 +242,7 @@
             card.innerHTML = `
                 <div class="child-card-header">
                     <span class="child-card-title">Kind ${idx}</span>
-                    <button class="child-remove-btn" onclick="removeChild(${idx})" type="button" aria-label="Kind ${idx} entfernen">✕</button>
+                    <button class="child-remove-btn" type="button" aria-label="Kind ${idx} entfernen">✕</button>
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="childName${idx}">Vorname des Kindes</label>
@@ -271,6 +271,15 @@
 
             list.appendChild(card);
 
+            // Add Event Listener to Remove Button
+            const removeBtn = card.querySelector('.child-remove-btn');
+            if (removeBtn) {
+                removeBtn.addEventListener('click', () => {
+                    console.log('Remove button clicked for card:', card.id);
+                    removeChild(card);
+                });
+            }
+
             // Load existing image
             if (existingImage) {
                 const preview = document.getElementById(`preview${idx}`);
@@ -290,16 +299,33 @@
         }
 
         // ========== REMOVE CHILD ==========
-        function removeChild(idx) {
-            const card = document.getElementById(`child-card-${idx}`);
+        function removeChild(cardOrIdx) {
+            let card;
+            if (typeof cardOrIdx === 'object') {
+                card = cardOrIdx;
+            } else {
+                card = document.getElementById(`child-card-${cardOrIdx}`);
+            }
+
             if (card) {
                 card.style.animation = 'slideIn 0.3s ease reverse';
                 setTimeout(() => {
                     card.remove();
+                    relabelChildren();
                     updateChildrenCount();
                     updateAddButton();
                 }, 280);
             }
+        }
+
+        function relabelChildren() {
+            const cards = document.querySelectorAll('.child-card');
+            cards.forEach((card, index) => {
+                const title = card.querySelector('.child-card-title');
+                if (title) title.textContent = `Kind ${index + 1}`;
+            });
+            // Don't reset childCount global, just use it for unique IDs if needed,
+            // but relabel the UI for the user.
         }
 
         // ========== IMAGE UPLOAD & COMPRESSION ==========
@@ -331,6 +357,7 @@
                 if (text) text.style.display = 'none';
 
                 const card = document.getElementById(`child-card-${idx}`);
+                // We store the Base64 for now, and upload it only when "Save" is clicked
                 if (card) card.dataset.imageData = compressedBase64;
 
                 showToast('✅ Bild bereit!');
@@ -424,55 +451,96 @@
             }
         }
 
+        // Helper to convert Base64 to Blob
+        function dataURLtoBlob(dataurl) {
+            var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+                bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+            while (n--) { u8arr[n] = bstr.charCodeAt(n); }
+            return new Blob([u8arr], { type: mime });
+        }
+
         // ========== SAVE ==========
         async function saveData() {
             const cards = document.querySelectorAll('.child-card');
+            const saveBtn = document.getElementById('saveBtn');
+            const originalBtnText = saveBtn.textContent;
+
+            saveBtn.disabled = true;
+            saveBtn.textContent = '⏳ Speichere Bilder...';
+
             const children = [];
 
-            cards.forEach(card => {
-                const nameInput = card.querySelector('.child-name-input');
-                const rawName = nameInput ? nameInput.value : '';
-                const name = sanitize(rawName);
-                const imageData = card.dataset.imageData || '';
+            try {
+                for (const card of cards) {
+                    const nameInput = card.querySelector('.child-name-input');
+                    const rawName = nameInput ? nameInput.value : '';
+                    const name = sanitize(rawName);
+                    let imageData = card.dataset.imageData || '';
 
-                if (name) {
+                    if (!name) continue;
+
+                    // If it's a NEW image (Base64), upload it to Supabase Storage
+                    if (imageData.startsWith('data:image')) {
+                        const fileName = `${familyId}/${Date.now()}_${name.toLowerCase().replace(/\s/g, '_')}.jpg`;
+                        const blob = dataURLtoBlob(imageData);
+
+                        const { data: uploadData, error: uploadError } = await supabaseClient
+                            .storage
+                            .from('child-images')
+                            .upload(fileName, blob, {
+                                upsert: true,
+                                contentType: 'image/jpeg'
+                            });
+
+                        if (uploadError) {
+                            console.error('[Storage] Upload error:', uploadError);
+                            throw new Error(`Upload fehlgeschlagen für ${name}: ${uploadError.message}`);
+                        }
+
+                        // Get Public URL
+                        const { data: publicUrlData } = supabaseClient
+                            .storage
+                            .from('child-images')
+                            .getPublicUrl(fileName);
+
+                        imageData = publicUrlData.publicUrl;
+                    }
+
                     children.push({ name, imageData });
                 }
-            });
 
-            if (children.length === 0) {
-                showToast('Bitte mindestens ein Kind anlegen!', true);
-                return;
-            }
+                if (children.length === 0) {
+                    showToast('Bitte mindestens ein Kind anlegen!', true);
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = originalBtnText;
+                    return;
+                }
 
-            // Save to localStorage (Local Cache)
-            localStorage.setItem('ramadan_children', JSON.stringify(children));
+                // Save to localStorage (Local Cache)
+                localStorage.setItem('ramadan_children', JSON.stringify(children));
 
-            // Save to Supabase (Secure Cloud Backup)
-            if (supabaseClient && familyId) {
-                try {
+                // Save to Supabase (Secure Cloud Backup)
+                if (supabaseClient && familyId) {
                     const { error: sbError } = await supabaseClient.from('families').upsert({
                         family_id: familyId,
-                        children: children, // Including Base64 images
+                        children: children, // Now contains URLs instead of Base64
                         updated_at: new Date().toISOString()
                     }, { onConflict: 'family_id' });
 
-                    if (sbError) {
-                        console.error('[Setup] Supabase save error:', sbError);
-                        showToast('Fehler bei Cloud-Speicherung: ' + sbError.message, true);
-                        return; // Stop if cloud save failed
-                    }
-                } catch (e) {
-                    console.warn('[Setup] Supabase save failed:', e);
-                    showToast('Cloud-Verbindung fehlgeschlagen.', true);
-                    return;
+                    if (sbError) throw sbError;
                 }
-            }
 
-            showToast('✅ Gespeichert!');
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1200);
+                showToast('✅ Alles gespeichert!');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1200);
+
+            } catch (err) {
+                console.error('[Setup] Save failed:', err);
+                showToast(err.message || 'Speichern fehlgeschlagen.', true);
+                saveBtn.disabled = false;
+                saveBtn.textContent = originalBtnText;
+            }
         }
 
         // ========== TOAST ==========
