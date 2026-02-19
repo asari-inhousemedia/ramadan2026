@@ -20,42 +20,42 @@ try {
 
 // ========== FALLBACK TASKS (used until Supabase table is ready) ==========
 const FALLBACK_TASKS = [
-    { day: 1, icon: '😊', title: 'Lächeln schenken', task: 'Schenke heute jemandem ein ehrliches Lächeln und sag etwas Nettes.' },
-    { day: 2, icon: '🤲', title: 'Dua für andere', task: 'Bete heute ein Dua für jemanden, den du liebst.' },
-    { day: 3, icon: '📖', title: 'Quran lesen', task: 'Lies heute mindestens eine Seite aus dem Quran.' },
-    { day: 4, icon: '🍽️', title: 'Essen teilen', task: 'Teile heute dein Essen mit einem Nachbarn oder Freund.' },
-    { day: 5, icon: '🧹', title: 'Helfen im Haushalt', task: 'Hilf heute ohne gefragt zu werden im Haushalt mit.' },
-    { day: 6, icon: '💌', title: 'Brief schreiben', task: 'Schreibe einen lieben Brief oder eine Nachricht an jemanden.' },
-    { day: 7, icon: '🌳', title: 'Natur genießen', task: 'Gehe heute nach draußen und danke Allah für die Natur.' },
-    { day: 8, icon: '🤝', title: 'Versöhnung', task: 'Versöhne dich heute mit jemandem, mit dem du im Streit warst.' },
-    { day: 9, icon: '💰', title: 'Spenden', task: 'Spende heute etwas – egal wie klein – für einen guten Zweck.' },
-    { day: 10, icon: '🧸', title: 'Spielzeug verschenken', task: 'Verschenke ein Spielzeug, das du nicht mehr brauchst.' },
-    { day: 11, icon: '🕌', title: 'Moschee besuchen', task: 'Besuche heute die Moschee für ein gemeinsames Gebet.' },
-    { day: 12, icon: '👴', title: 'Ältere besuchen', task: 'Besuche oder rufe heute Oma, Opa oder ältere Nachbarn an.' },
-    { day: 13, icon: '🎨', title: 'Kreativ sein', task: 'Male ein schönes Bild zum Thema Ramadan.' },
-    { day: 14, icon: '🙏', title: 'Extra Gebet', task: 'Bete heute ein zusätzliches freiwilliges Gebet.' },
-    { day: 15, icon: '📚', title: 'Geschichte lernen', task: 'Lerne heute eine Geschichte über einen Propheten.' },
-    { day: 16, icon: '🥤', title: 'Wasser schätzen', task: 'Denke heute beim Trinken daran, wie wertvoll Wasser ist.' },
-    { day: 17, icon: '🌙', title: 'Nachtgebet', task: 'Versuche heute Nacht aufzustehen und ein kurzes Gebet zu sprechen.' },
-    { day: 18, icon: '👨‍👩‍👧‍👦', title: 'Familie', task: 'Verbringe heute bewusst Zeit mit deiner Familie.' },
-    { day: 19, icon: '🍪', title: 'Backen', task: 'Backe heute Kekse oder Kuchen und teile sie mit anderen.' },
-    { day: 20, icon: '🗑️', title: 'Aufräumen', task: 'Räume heute dein Zimmer gründlich auf und halte es sauber.' },
-    { day: 21, icon: '🤫', title: 'Geduld üben', task: 'Übe heute besonders viel Geduld – auch wenn es schwer fällt.' },
-    { day: 22, icon: '🎁', title: 'Überraschung', task: 'Überrasche heute jemanden mit einer kleinen Freude.' },
-    { day: 23, icon: '💧', title: 'Dhikr machen', task: 'Sage heute 100 Mal "SubhanAllah" über den Tag verteilt.' },
-    { day: 24, icon: '🌟', title: 'Vorbild sein', task: 'Sei heute ein gutes Vorbild für andere Kinder.' },
-    { day: 25, icon: '📿', title: 'Dankbarkeit', task: 'Schreibe 5 Dinge auf, für die du heute dankbar bist.' },
-    { day: 26, icon: '🕊️', title: 'Frieden stiften', task: 'Hilf heute dabei, einen Streit zwischen anderen zu schlichten.' },
-    { day: 27, icon: '✨', title: 'Lailat al-Qadr', task: 'Heute könnte die Nacht der Bestimmung sein – bete besonders viel!' },
-    { day: 28, icon: '🧕', title: 'Eltern ehren', task: 'Sage heute deinen Eltern, wie sehr du sie liebst.' },
-    { day: 29, icon: '🌅', title: 'Sonnenaufgang', task: 'Stehe heute früh auf und beobachte den Sonnenaufgang.' },
-    { day: 30, icon: '🎉', title: 'Bayram-Vorfreude', task: 'Bereite dich heute auf das Bayram-Fest vor – dein Geschenk wartet! 🎁' }
+    { id: 'f1', day: 1, icon: '😊', title: 'Lächeln schenken', task: 'Schenke heute jemandem ein ehrliches Lächeln und sag etwas Nettes.' },
+    { id: 'f2', day: 2, icon: '🤲', title: 'Dua für andere', task: 'Bete heute ein Dua für jemanden, den du liebst.' },
+    { id: 'f3', day: 3, icon: '📖', title: 'Quran lesen', task: 'Lies heute mindestens eine Seite aus dem Quran.' },
+    { id: 'f4', day: 4, icon: '🍽️', title: 'Essen teilen', task: 'Teile heute dein Essen mit einem Nachbarn oder Freund.' },
+    { id: 'f5', day: 5, icon: '🧹', title: 'Helfen im Haushalt', task: 'Hilf heute ohne gefragt zu werden im Haushalt mit.' },
+    { id: 'f6', day: 6, icon: '💌', title: 'Brief schreiben', task: 'Schreibe einen lieben Brief oder eine Nachricht an jemanden.' },
+    { id: 'f7', day: 7, icon: '🌳', title: 'Natur genießen', task: 'Gehe heute nach draußen und danke Allah für die Natur.' },
+    { id: 'f8', day: 8, icon: '🤝', title: 'Versöhnung', task: 'Versöhne dich heute mit jemandem, mit dem du im Streit warst.' },
+    { id: 'f9', day: 9, icon: '💰', title: 'Spenden', task: 'Spende heute etwas – egal wie klein – für einen guten Zweck.' },
+    { id: 'f10', day: 10, icon: '🧸', title: 'Spielzeug verschenken', task: 'Verschenke ein Spielzeug, das du nicht mehr brauchst.' },
+    { id: 'f11', day: 11, icon: '🕌', title: 'Moschee besuchen', task: 'Besuche heute die Moschee für ein gemeinsames Gebet.' },
+    { id: 'f12', day: 12, icon: '👴', title: 'Ältere besuchen', task: 'Besuche oder rufe heute Oma, Opa oder ältere Nachbarn an.' },
+    { id: 'f13', day: 13, icon: '🎨', title: 'Kreativ sein', task: 'Male ein schönes Bild zum Thema Ramadan.' },
+    { id: 'f14', day: 14, icon: '🙏', title: 'Extra Gebet', task: 'Bete heute ein zusätzliches freiwilliges Gebet.' },
+    { id: 'f15', day: 15, icon: '📚', title: 'Geschichte lernen', task: 'Lerne heute eine Geschichte über einen Propheten.' },
+    { id: 'f16', day: 16, icon: '🥤', title: 'Wasser schätzen', task: 'Denke heute beim Trinken daran, wie wertvoll Wasser ist.' },
+    { id: 'f17', day: 17, icon: '🌙', title: 'Nachtgebet', task: 'Versuche heute Nacht aufzustehen und ein kurzes Gebet zu sprechen.' },
+    { id: 'f18', day: 18, icon: '👨‍👩‍👧‍👦', title: 'Familie', task: 'Verbringe heute bewusst Zeit mit deiner Familie.' },
+    { id: 'f19', day: 19, icon: '🍪', title: 'Backen', task: 'Backe heute Kekse oder Kuchen und teile sie mit anderen.' },
+    { id: 'f20', day: 20, icon: '🗑️', title: 'Aufräumen', task: 'Räume heute dein Zimmer gründlich auf und halte es sauber.' },
+    { id: 'f21', day: 21, icon: '🤫', title: 'Geduld üben', task: 'Übe heute besonders viel Geduld – auch wenn es schwer fällt.' },
+    { id: 'f22', day: 22, icon: '🎁', title: 'Überraschung', task: 'Überrasche heute jemanden mit einer kleinen Freude.' },
+    { id: 'f23', day: 23, icon: '💧', title: 'Dhikr machen', task: 'Sage heute 100 Mal "SubhanAllah" über den Tag verteilt.' },
+    { id: 'f24', day: 24, icon: '🌟', title: 'Vorbild sein', task: 'Sei heute ein gutes Vorbild für andere Kinder.' },
+    { id: 'f25', day: 25, icon: '📿', title: 'Dankbarkeit', task: 'Schreibe 5 Dinge auf, für die du heute dankbar bist.' },
+    { id: 'f26', day: 26, icon: '🕊️', title: 'Frieden stiften', task: 'Hilf heute dabei, einen Streit zwischen anderen zu schlichten.' },
+    { id: 'f27', day: 27, icon: '✨', title: 'Lailat al-Qadr', task: 'Heute könnte die Nacht der Bestimmung sein – bete besonders viel!' },
+    { id: 'f28', day: 28, icon: '🧕', title: 'Eltern ehren', task: 'Sage heute deinen Eltern, wie sehr du sie liebst.' },
+    { id: 'f29', day: 29, icon: '🌅', title: 'Sonnenaufgang', task: 'Stehe heute früh auf und beobachte den Sonnenaufgang.' },
+    { id: 'f30', day: 30, icon: '🎉', title: 'Bayram-Vorfreude', task: 'Bereite dich heute auf das Bayram-Fest vor – dein Geschenk wartet! 🎁' }
 ];
 
 // ========== STATE ==========
 let dailyTasks = [...FALLBACK_TASKS]; // Will be replaced by Supabase data
-let completedDays = [];
-let revealedTiles = [];
+let completedTasks = []; // UUIDs of completed tasks
+let revealedTiles = []; // Day numbers that have unlocked a tile
 let tileMapping = []; // tileMapping[doorIndex] = tileIndex (random shuffle)
 let currentChild = null;
 let childrenData = [];
@@ -259,9 +259,9 @@ async function loadDailyTasks() {
             .select('*')
             .order('day', { ascending: true });
 
-        if (!error && data && data.length === 30) {
+        if (!error && data && data.length > 0) {
             dailyTasks = data;
-            console.log('[Ramadan] Tasks loaded from Supabase.');
+            console.log(`[Ramadan] ${data.length} tasks loaded from Supabase.`);
         }
     } catch (e) {
         console.warn('[Ramadan] Could not load tasks from Supabase, using fallback.');
@@ -315,7 +315,7 @@ async function loadFamilyData() {
         try {
             const { data: progData } = await supabaseClient
                 .from('progress')
-                .select('child_name, completed_days')
+                .select('child_name, completed_tasks')
                 .eq('family_id', familyId);
             if (progData) allProgressData = progData;
         } catch (e) { }
@@ -333,9 +333,9 @@ function loadFromLocalStorage() {
             // Also load star counts for all children from local storage
             allProgressData = childrenData.map(child => {
                 const safeName = sanitize(child.name);
-                const key = `ramadan_completed_${safeName}`;
+                const key = `ramadan_completed_tasks_${safeName}`; // Updated key
                 const completed = JSON.parse(localStorage.getItem(key) || '[]');
-                return { child_name: safeName, completed_days: completed };
+                return { child_name: safeName, completed_tasks: completed }; // Updated property
             });
 
         } catch (e) {
@@ -365,7 +365,7 @@ function renderChildTabs() {
 
         // Find star count for this child
         const childProg = allProgressData.find(p => p.child_name === child.name);
-        const starCount = childProg ? (childProg.completed_days || []).length : 0;
+        const starCount = childProg ? (childProg.completed_tasks || []).length : 0; // Updated property
 
         tab.innerHTML = `<span>${sanitize(child.name)}</span> <span class="tab-star">⭐ ${starCount}</span>`;
         tab.setAttribute('aria-label', `${sanitize(child.name)}: ${starCount} Sterne gesammelt`);
@@ -419,21 +419,21 @@ async function loadChildProgress(childName) {
         try {
             const { data, error } = await supabaseClient
                 .from('progress')
-                .select('completed_days, revealed_tiles')
+                .select('completed_tasks, revealed_tiles') // Updated property
                 .eq('family_id', familyId)
                 .eq('child_name', safeName)
                 .single();
 
             if (!error && data) {
-                completedDays = data.completed_days || [];
+                completedTasks = data.completed_tasks || []; // Updated property
                 revealedTiles = data.revealed_tiles || [];
 
                 // Sync with local cache for tabs
                 const idx = allProgressData.findIndex(p => p.child_name === safeName);
                 if (idx !== -1) {
-                    allProgressData[idx].completed_days = completedDays;
+                    allProgressData[idx].completed_tasks = completedTasks; // Updated property
                 } else {
-                    allProgressData.push({ child_name: safeName, completed_days: completedDays });
+                    allProgressData.push({ child_name: safeName, completed_tasks: completedTasks }); // Updated property
                 }
                 return;
             }
@@ -441,13 +441,13 @@ async function loadChildProgress(childName) {
     }
 
     // Fallback: localStorage
-    const key = `ramadan_completed_${safeName}`;
+    const key = `ramadan_completed_tasks_${safeName}`; // Updated key
     const revKey = `ramadan_revealed_${safeName}`;
     try {
-        completedDays = JSON.parse(localStorage.getItem(key) || '[]');
+        completedTasks = JSON.parse(localStorage.getItem(key) || '[]'); // Updated property
         revealedTiles = JSON.parse(localStorage.getItem(revKey) || '[]');
     } catch (e) {
-        completedDays = [];
+        completedTasks = []; // Updated property
         revealedTiles = [];
     }
 }
@@ -524,9 +524,12 @@ function buildCalendarGrid() {
             isLocked = true;
         }
 
-        // Nur als 'completed' anzeigen, wenn NICHT gesperrt
-        // Das verhindert, dass alte Testdaten (z.B. Tag 2 schon offen) das Schloss überschreiben
-        if (completedDays.includes(i) && !isLocked) {
+        // Ein Tag gilt als "fertig" fürs Kalenderblatt, wenn mindestens eine Aufgabe gemacht wurde
+        // Check if any task for this day is completed
+        const tasksForThisDay = dailyTasks.filter(task => task.day === i);
+        const anyTaskCompletedForDay = tasksForThisDay.some(task => completedTasks.includes(task.id));
+
+        if (anyTaskCompletedForDay && !isLocked) {
             day.classList.add('completed');
             day.innerHTML = `<span class="star-icon">⭐</span><span class="day-num">${i}</span>`;
         }
@@ -588,13 +591,7 @@ function setupModal() {
         if (e.target === overlay) closeModal();
     });
 
-    if (doneBtn) doneBtn.addEventListener('click', () => {
-        const dayNum = parseInt(doneBtn.dataset.day);
-        if (dayNum && !completedDays.includes(dayNum)) {
-            markDayCompleted(dayNum);
-        }
-        closeModal();
-    });
+    if (doneBtn) doneBtn.style.display = 'none'; // We use individual buttons now
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeModal();
@@ -602,52 +599,78 @@ function setupModal() {
 }
 
 function openModal(dayNum) {
-    const taskData = dailyTasks.find(t => t.day === dayNum);
-    if (!taskData) return;
+    const tasksForDay = dailyTasks.filter(t => t.day === dayNum);
+    if (tasksForDay.length === 0) return;
 
     const overlay = document.getElementById('modalOverlay');
     const badge = document.getElementById('modalDayBadge');
     const title = document.getElementById('modalTitle');
-    const task = document.getElementById('modalTask');
-    const doneBtn = document.getElementById('modalDoneBtn');
+    const taskContainer = document.getElementById('modalTask');
 
     badge.textContent = `Tag ${dayNum}`;
-    title.textContent = `${taskData.icon || '🌙'} ${sanitize(taskData.title)}`;
-    task.textContent = sanitize(taskData.task);
-    doneBtn.dataset.day = dayNum;
+    title.textContent = `Tag ${dayNum}: Deine Aufgaben`;
 
-    if (completedDays.includes(dayNum)) {
-        doneBtn.textContent = '✅ Bereits erledigt!';
-        doneBtn.style.opacity = '0.6';
-        doneBtn.style.cursor = 'default';
-    } else {
-        doneBtn.textContent = 'Ich hab\'s geschafft! ✨';
-        doneBtn.style.opacity = '1';
-        doneBtn.style.cursor = 'pointer';
-    }
+    taskContainer.innerHTML = '';
+
+    tasksForDay.forEach(taskData => {
+        const isDone = completedTasks.includes(taskData.id); // Check by task ID
+
+        const taskEl = document.createElement('div');
+        taskEl.className = 'modal-task-item';
+        taskEl.style = `
+            background: rgba(0,0,0,0.03);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            text-align: left;
+            border-left: 4px solid ${isDone ? '#3de8a0' : 'var(--gold-primary)'};
+        `;
+
+        taskEl.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h4 style="margin:0; font-size:1.05rem; color:var(--modal-text);">${taskData.icon || '🌙'} ${sanitize(taskData.title)}</h4>
+                ${isDone ? '<span style="color:#2ecc71; font-weight:700;">✅</span>' : ''}
+            </div>
+            <p style="margin:8px 0 12px 0; font-size:0.95rem; color:var(--modal-text-secondary); line-height:1.4;">${sanitize(taskData.task)}</p>
+            ${!isDone ? `<button class="modal-btn-small" onclick="markTaskCompleted('${taskData.id}', ${dayNum})" style="
+                background: var(--gold-primary);
+                color: white;
+                border: none;
+                padding: 6px 14px;
+                border-radius: 20px;
+                font-size: 0.85rem;
+                cursor: pointer;
+                transition: opacity 0.2s;
+            ">Ich hab's geschafft! ⭐</button>` : ''}
+        `;
+        taskContainer.appendChild(taskEl);
+    });
 
     overlay.classList.add('active');
     document.body.style.overflow = 'hidden';
 }
 
-function closeModal() {
-    const overlay = document.getElementById('modalOverlay');
-    if (overlay) overlay.classList.remove('active');
-    document.body.style.overflow = '';
-}
+async function markTaskCompleted(taskId, dayNum) {
+    if (completedTasks.includes(taskId)) return;
 
-// ========== MARK DAY COMPLETED ==========
-async function markDayCompleted(dayNum) {
-    if (completedDays.includes(dayNum)) return;
+    completedTasks.push(taskId);
 
-    completedDays.push(dayNum);
+    // Check if this is the first task completed for this day
+    const tasksForDay = dailyTasks.filter(t => t.day === dayNum);
+    const previouslyCompletedTasksForDay = tasksForDay.filter(t => completedTasks.includes(t.id) && t.id !== taskId);
 
-    // Update calendar tile
-    const calDay = document.getElementById(`calendar-day-${dayNum}`);
-    if (calDay) calDay.classList.add('completed');
-
-    // Reveal random mosaic tile
-    revealRandomTile(dayNum);
+    if (previouslyCompletedTasksForDay.length === 0) { // If this is the first task for the day being completed
+        // Reveal random mosaic tile ONLY if it's the first task of this day
+        if (!revealedTiles.includes(dayNum)) {
+            revealRandomTile(dayNum);
+            // Update calendar tile visually
+            const calDay = document.getElementById(`calendar-day-${dayNum}`);
+            if (calDay) {
+                calDay.classList.add('completed');
+                calDay.innerHTML = `<span class="star-icon">⭐</span><span class="day-num">${dayNum}</span>`;
+            }
+        }
+    }
 
     // Confetti
     spawnConfetti();
@@ -655,8 +678,11 @@ async function markDayCompleted(dayNum) {
     // Save progress
     await saveProgress();
 
-    // Update Tabs (to show new star count)
+    // Update UI
     renderChildTabs();
+
+    // Refresh the modal to show the checkmark
+    openModal(dayNum);
 
     // Day 30 celebration
     if (dayNum === 30 && revealedTiles.length >= 30) {
@@ -666,12 +692,11 @@ async function markDayCompleted(dayNum) {
 
 // ========== REVEAL TILE (Random Mapping) ==========
 function revealRandomTile(dayNum) {
-    // tileMapping[dayNum - 1] gives the tile index for this door
+    if (revealedTiles.includes(dayNum)) return;
+
+    // Mapping: which day (1-30) reveals which tile (0-29)
     const tileIndex = tileMapping[dayNum - 1];
-
-    if (revealedTiles.includes(tileIndex)) return;
-
-    revealedTiles.push(tileIndex);
+    revealedTiles.push(dayNum);
 
     const tile = document.getElementById(`mosaic-tile-${tileIndex}`);
     if (tile) {
@@ -700,7 +725,7 @@ async function saveProgress() {
     const safeName = currentChild ? sanitize(currentChild.name) : 'default';
 
     // localStorage backup
-    localStorage.setItem(`ramadan_completed_${safeName}`, JSON.stringify(completedDays));
+    localStorage.setItem(`ramadan_completed_tasks_${safeName}`, JSON.stringify(completedTasks)); // Updated key and variable
     localStorage.setItem(`ramadan_revealed_${safeName}`, JSON.stringify(revealedTiles));
 
     // Supabase
@@ -710,9 +735,9 @@ async function saveProgress() {
         await supabaseClient.from('progress').upsert({
             family_id: familyId,
             child_name: safeName,
-            completed_days: completedDays,
+            completed_tasks: completedTasks,
             revealed_tiles: revealedTiles,
-            updated_at: new Date().toISOString()
+            last_updated: new Date().toISOString()
         }, { onConflict: 'family_id,child_name' });
     } catch (e) {
         console.warn('[Ramadan] Progress save to Supabase failed:', e);

@@ -111,7 +111,8 @@
         // ========== PASSWORD CHECK ==========
         function checkPassword() {
             const input = document.getElementById('adminPassword').value;
-            if (input === ADMIN_PASSWORD || sessionStorage.getItem('admin_auth') === 'true') {
+            // Simplified check for now. Later we can integrate actual Supabase Auth.
+            if (input === ADMIN_PASSWORD_HASH || sessionStorage.getItem('admin_auth') === 'true') {
                 sessionStorage.setItem('admin_auth', 'true');
                 document.getElementById('adminLogin').style.display = 'none';
                 document.getElementById('adminContent').style.display = 'block';
