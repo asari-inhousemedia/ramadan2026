@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Admin – Ramadan Kalender 2026</title>
+    <title>Monitoring – Ramadan Kalender 2026</title>
     <meta name="robots" content="noindex, nofollow">
     <link rel="icon"
-        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔐</text></svg>">
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -19,14 +19,14 @@
 <body>
     <!-- Login Gate -->
     <div class="admin-login" id="adminLogin">
-        <h2>🔐 Admin-Bereich</h2>
+        <h2>📊 Projekt-Monitoring</h2>
         <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:20px;">
-            Dieser Bereich ist nur für den Administrator zugänglich.
+            Dieser Bereich dient der Überwachung der Live-Daten.
         </p>
-        <input type="password" id="adminPassword" placeholder="Passwort eingeben" autocomplete="current-password">
+        <input type="password" id="adminPassword" placeholder="Zugangscode eingeben" autocomplete="current-password">
         <button onclick="checkPassword()" id="loginBtn">Einloggen</button>
         <p id="loginError" style="color:#ff6b6b; font-size:0.82rem; margin-top:10px; display:none;">
-            ❌ Falsches Passwort
+            ❌ Falscher Zugangscode
         </p>
     </div>
 
@@ -35,8 +35,8 @@
         <a href="index.html" class="setup-back">← Zurück zum Kalender</a>
 
         <div class="admin-header">
-            <h1>🔐 Admin-Bereich</h1>
-            <p>Alle 30 Türen auf einen Blick – nur für dich sichtbar.</p>
+            <h1>📊 Monitoring-Board</h1>
+            <p>Ereignisse und Türen im Überblick.</p>
         </div>
 
         <!-- Stats -->
@@ -57,14 +57,12 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         /* ======================================
-           ADMIN PAGE LOGIC
-           Only accessible via direct URL
+           MONITORING PAGE LOGIC
            ====================================== */
 
         const SUPABASE_URL = 'https://thscbzyzblpqwbskymbg.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_w4wZcJW_TOnzxlgr-kMr5Q_aCu8OxTz';
 
-        // Admin password – change this to something secure!
         const ADMIN_PASSWORD_HASH = 'ramadan2026admin';
 
         let supabaseClient = null;
@@ -74,25 +72,16 @@
             }
         } catch (e) { }
 
-        // Fallback tasks (same as main script)
+        // Fallback tasks
         const FALLBACK_TASKS = [
             { id: 'f1-1', day: 1, icon: '👋', title: 'Begrüßung', task: 'Sage „Ramadan Mubarak!" oder „Hayırlı Ramazanlar!" zu jedem in deiner Familie.' },
             { id: 'f1-2', day: 1, icon: '🧠', title: 'Verstehen', task: 'Frage deine Eltern: „Warum fasten Muslime im Ramadan?" und hör gut zu.' },
-            { id: 'f1-3', day: 1, icon: '❤️', title: 'Herzensaufgabe', task: 'Male ein Bild oder zeichne etwas, auf das du dich im Ramadan freust.' },
-            { id: 'f2-1', day: 2, icon: '🤝', title: 'Helfen', task: 'Hilf beim Tischdecken für das Iftar-Essen.' },
-            { id: 'f2-2', day: 2, icon: '🌙', title: 'Freundlichkeit', task: 'Sage heute mindestens 3 Mal „Danke" – ohne dass jemand dich daran erinnert.' },
-            { id: 'f2-3', day: 2, icon: '🌙', title: 'Aufmerksamkeit', task: 'Frage jemanden in der Familie: „Kann ich dir helfen?"' },
-            { id: 'f3-1', day: 3, icon: '🧠', title: 'Nachdenken', task: 'Denke an 3 Dinge, für die du heute dankbar bist – erzähle sie deinen Eltern.' },
-            { id: 'f3-2', day: 3, icon: '🙏', title: 'Dankeschön sagen', task: 'Bedanke dich bei jemandem, dem du noch nie richtig „Danke" gesagt hast.' },
-            { id: 'f3-3', day: 3, icon: '🧠', title: 'Vergleichen', task: 'Sprecht in der Familie darüber: Was haben wir, das andere nicht haben?' },
-            { id: 'f4', day: 4, icon: '🍽️', title: 'Essen teilen', task: 'Teile heute dein Essen mit einem Nachbarn oder Freund.' },
-            { id: 'f5', day: 5, icon: '🧹', title: 'Helfen im Haushalt', task: 'Hilf heute ohne gefragt zu werden im Haushalt mit.' }
+            { id: 'f1-3', day: 1, icon: '❤️', title: 'Herzensaufgabe', task: 'Male ein Bild oder zeichne etwas, auf das du dich im Ramadan freust.' }
         ];
 
         // ========== PASSWORD CHECK ==========
         function checkPassword() {
             const input = document.getElementById('adminPassword').value;
-            // Simplified check for now. Later we can integrate actual Supabase Auth.
             if (input === ADMIN_PASSWORD_HASH || sessionStorage.getItem('admin_auth') === 'true') {
                 sessionStorage.setItem('admin_auth', 'true');
                 document.getElementById('adminLogin').style.display = 'none';
@@ -105,7 +94,6 @@
             }
         }
 
-        // Check if already authenticated via session
         document.addEventListener('DOMContentLoaded', () => {
             if (sessionStorage.getItem('admin_auth') === 'true') {
                 checkPassword();
@@ -120,11 +108,10 @@
             }
         });
 
-        // ========== LOAD ADMIN DATA ==========
+        // ========== LOAD DATA ==========
         async function loadAdminData() {
             let tasks = [...FALLBACK_TASKS];
 
-            // Try to load from Supabase
             if (supabaseClient) {
                 try {
                     const { data, error } = await supabaseClient
@@ -137,7 +124,6 @@
                     }
                 } catch (e) { }
 
-                // Load stats
                 try {
                     const { count } = await supabaseClient
                         .from('families')
@@ -152,15 +138,14 @@
             renderDoors(tasks);
         }
 
-        // ========== RENDER STATS ==========
         function renderStats(familyCount) {
             const container = document.getElementById('adminStats');
             if (!container) return;
 
             const stats = [
                 { label: 'Familien registriert', value: familyCount, icon: '👨‍👩‍👧‍👦' },
-                { label: 'Türen gesamt', value: 30, icon: '🚪' },
-                { label: 'App Version', value: '1.0.0', icon: '📱' }
+                { label: 'Tage aktiv', value: 30, icon: '🗓️' },
+                { label: 'System-Status', value: 'Live', icon: '🟢' }
             ];
 
             container.innerHTML = stats.map(s => `
@@ -179,24 +164,48 @@
             `).join('');
         }
 
-        // ========== RENDER DOORS ==========
         function renderDoors(tasks) {
             const grid = document.getElementById('adminGrid');
             if (!grid) return;
             grid.innerHTML = '';
 
-            tasks.forEach(task => {
+            // Group tasks by day
+            const grouped = {};
+            tasks.forEach(t => {
+                if (!grouped[t.day]) grouped[t.day] = [];
+                grouped[t.day].push(t);
+            });
+
+            // Iterate through days 1-30
+            for (let d = 1; d <= 30; d++) {
+                const dayTasks = grouped[d] || [];
+                if (dayTasks.length === 0) continue;
+
                 const door = document.createElement('div');
                 door.className = 'admin-door';
-                door.innerHTML = `
-                    <div class="admin-door-header">
-                        <div class="admin-door-num">${task.day}</div>
-                        <div class="admin-door-title">${task.icon || '🌙'} ${escapeHtml(task.title)}</div>
+
+                let tasksHtml = dayTasks.map(t => `
+                    <div style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <div style="font-weight: 700; color: var(--gold-light); font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+                            <span>${t.icon || '🌙'}</span> ${escapeHtml(t.title)}
+                        </div>
+                        <div style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; margin-top: 4px;">
+                            ${escapeHtml(t.task)}
+                        </div>
                     </div>
-                    <div class="admin-door-task">${escapeHtml(task.task)}</div>
+                `).join('');
+
+                door.innerHTML = `
+                    <div class="admin-door-header" style="margin-bottom: 15px;">
+                        <div class="admin-door-num">${d}</div>
+                        <div style="font-family: var(--font-display); font-size: 1.1rem; color: white;">Tag ${d}</div>
+                    </div>
+                    <div class="admin-door-content">
+                        ${tasksHtml}
+                    </div>
                 `;
                 grid.appendChild(door);
-            });
+            }
         }
 
         function escapeHtml(str) {
