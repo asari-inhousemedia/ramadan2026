@@ -207,7 +207,7 @@
         </div>
     </div>
 
-    <div class="ver-tag">v1.0.7</div>
+    <div class="ver-tag">v1.0.8</div>
 
     <script>
         // Supabase Initialization
@@ -216,46 +216,68 @@
             const SUPABASE_URL = 'https://thscbzyzblpqwbskymbg.supabase.co';
             const SUPABASE_KEY = 'sb_publishable_w4wZcJW_TOnzxlgr-kMr5Q_aCu8OxTz';
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            console.log("Supabase Client geladen");
         } catch (e) { console.error("Supabase Error:", e); }
 
         async function handleAuth() {
-            if (!supabase) { alert("Verbindung fehlgeschlagen. Bitte Seite neu laden."); return; }
+            console.log("handleAuth gestartet. Modus: " + (isLoginMode ? "Login" : "Register"));
+
+            if (!supabase) {
+                alert("Verbindung fehlgeschlagen. Bitte Seite neu laden.");
+                return;
+            }
 
             var email = document.getElementById('email').value;
             var password = document.getElementById('password').value;
             var btn = document.getElementById('submitBtn');
             var errBox = document.getElementById('errorMsg');
 
+            if (!email || !password) {
+                alert("Bitte E-Mail und Passwort eingeben");
+                return;
+            }
+
             btn.disabled = true;
-            btn.innerText = 'Bitte warten...';
+            btn.innerText = 'Wird verarbeitet...';
             if (errBox) errBox.style.display = 'none';
 
             try {
                 let result;
                 if (isLoginMode) {
+                    console.log("Sende Login-Anfrage für: " + email);
                     result = await supabase.auth.signInWithPassword({ email: email, password: password });
                 } else {
+                    console.log("Sende Registrierungs-Anfrage für: " + email);
                     result = await supabase.auth.signUp({ email: email, password: password });
                 }
 
+                console.log("Antwort von Supabase erhalten:", result);
+
                 if (result.error) throw result.error;
 
-                if (result.data.session) {
+                if (result.data && result.data.session) {
+                    console.log("Erfolg! Session vorhanden. Leite weiter...");
                     window.location.href = 'index.html';
                 } else if (!isLoginMode) {
+                    console.log("Registrierung erfolgreich, versuche Auto-Login...");
                     // Automatischer Login nach Registration
                     const retry = await supabase.auth.signInWithPassword({ email: email, password: password });
-                    if (retry.data.session) {
+                    if (retry.data && retry.data.session) {
                         window.location.href = 'index.html';
                     } else {
-                        errBox.innerText = "Konto erstellt! Bitte melde dich jetzt an.";
+                        errBox.innerText = "Konto erstellt! Bitte melde dich jetzt mit deinen Daten an.";
                         errBox.style.display = 'block';
-                        doToggle();
+                        btn.disabled = false;
+                        btn.innerText = 'Anmelden';
+                        doToggle(); // Zurück zum Login-Modus
                     }
+                } else {
+                    throw new Error("Login fehlgeschlagen. Bitte prüfe deine Daten.");
                 }
             } catch (error) {
+                console.error("Fehler bei der Authentifizierung:", error);
                 if (errBox) {
-                    errBox.innerText = error.message;
+                    errBox.innerText = "Fehler: " + (error.message || "Unbekannter Fehler");
                     errBox.style.display = 'block';
                 }
             } finally {
