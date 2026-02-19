@@ -78,9 +78,9 @@
                 ">
                     🚪 <span data-i18n="nav_logout">Abmelden</span>
                 </button>
-                <p id="userEmailInfo" data-i18n="setup_logged_in"
-                    style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px; opacity: 0.7;">
-                    Du bist aktuell eingeloggt.
+                <p id="userEmailInfo" data-i18n="loading"
+                    style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 6px; opacity: 0.6; font-weight: 300;">
+                    ...
                 </p>
             </div>
 
@@ -140,7 +140,8 @@
             const userEmail = session.user.email;
             const emailInfo = document.getElementById('userEmailInfo');
             if (emailInfo && userEmail) {
-                emailInfo.textContent = t('setup_registered', { email: userEmail });
+                emailInfo.dataset.i18n = 'setup_registered';
+                emailInfo.dataset.i18nData = JSON.stringify({ email: userEmail });
             }
             console.log('[Setup] Init successful for:', window.familyId);
 
