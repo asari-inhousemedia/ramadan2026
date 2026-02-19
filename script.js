@@ -207,12 +207,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         buildCalendarGrid();
         setupModal();
         updateTilesCounter();
+
+        // Logout Listener
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', handleLogout);
+        }
     } catch (err) {
         console.error('[Ramadan] Initialization error:', err);
     } finally {
         showLoading(false);
     }
 });
+
+/**
+ * Handle user logout
+ */
+async function handleLogout() {
+    if (confirm('Möchtest du dich wirklich abmelden?')) {
+        if (supabaseClient) {
+            await supabaseClient.auth.signOut();
+        }
+        // Clear local session hints
+        localStorage.removeItem('ramadan_children');
+        localStorage.removeItem('ramadan_current_child');
+        window.location.href = 'login.html';
+    }
+}
 
 // ========== LOADING ==========
 function showLoading(show) {
