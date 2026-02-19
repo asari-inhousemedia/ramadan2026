@@ -144,7 +144,7 @@
     <div class="shooting-star"></div>
 
     <div class="login-container">
-        <div class="login-card">
+        <div class="login-card" style="position: relative; z-index: 10;">
             <div class="moon-icon-small">🌙</div>
 
             <div class="login-header">
@@ -169,13 +169,15 @@
                 <div id="errorMsg" class="error-msg"></div>
             </form>
 
-            <p class="toggle-text">
+            <div class="toggle-text">
                 <span id="toggleQuestion">Noch kein Konto?</span>
-                <span class="toggle-link" id="toggleBtn">Hier registrieren</span>
-            </p>
+                <button type="button" class="toggle-link" id="toggleBtn"
+                    style="background:none; border:none; padding:0; font-size:inherit; font-weight:600; text-decoration:underline;">Hier
+                    registrieren</button>
+            </div>
         </div>
 
-        <p style="margin-top: 24px; font-size: 0.8rem; opacity: 0.6;">
+        <p style="margin-top: 24px; font-size: 0.8rem; opacity: 0.6; position: relative; z-index: 10;">
             Deine Daten sind sicher. Wir versenden keine Werbung.
         </p>
     </div>
