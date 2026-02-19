@@ -24,9 +24,11 @@
         <h1>📜 Rechtliches</h1>
 
         <h2>Impressum</h2>
-        <p>
-            Inhouse Media<br>
-            Ahmad Sari<br>
+        <p style="line-height: 1.6;">
+            <strong>Inhouse Media</strong><br>
+            Ahmet Sari<br>
+            Eisenbahnstraße 1<br>
+            72072 Tübingen<br>
             Deutschland
         </p>
         <p>
@@ -47,17 +49,17 @@
             </li>
             <li><strong>Fortschritt</strong> – welche Türen geöffnet wurden (als Nummernliste)</li>
             <li><strong>Familien-ID</strong> – eine zufällig generierte, anonyme UUID (kein Bezug zu einer Person)</li>
-            <li><strong>Geschenk-Bild</strong> – wird lokal im Speicher des Geräts gespeichert (localStorage), nicht auf
-                externen Servern</li>
+            <li><strong>Geschenk-Bild</strong> – wird <u>ausschließlich lokal</u> auf deinem Gerät gespeichert
+                (localStorage), niemals auf externen Servern.</li>
         </ul>
 
         <h2>2. Wo werden die Daten gespeichert?</h2>
         <ul>
-            <li><strong>Lokal</strong> auf deinem Gerät (localStorage des Browsers) – der Vorname und das Bild verlassen
-                dein Gerät nicht.</li>
-            <li><strong>Supabase</strong> (supabase.co) – ein europäisch zertifizierter Datenbankdienst – speichert nur:
-                anonyme Family-ID, Kindervornamen und Fortschrittsdaten (geöffnete Türen). Kein Name ist einer Person
-                zuordenbar.</li>
+            <li><strong>Lokal</strong> auf deinem Gerät (localStorage) – das <strong>Geschenk-Bild</strong> verlässt
+                dein
+                Gerät niemals.</li>
+            <li><strong>Supabase</strong> (seriöser Datenbankanbieter) – speichert zur Synchronisation:
+                anonyme Family-ID, Kindervornamen und den Fortschritt (geöffnete Türen).</li>
         </ul>
 
         <h2>3. Warum werden Daten gespeichert?</h2>
