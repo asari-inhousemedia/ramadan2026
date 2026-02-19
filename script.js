@@ -184,24 +184,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     familyId = session.user.id;
     console.log('[Auth] User session found:', familyId);
 
+    // FIX: Initialize tile mapping based on the authenticated user ID
+    const seed = seedFromId(familyId);
+    const indices = Array.from({ length: 30 }, (_, i) => i);
+    tileMapping = seededShuffle(indices, seed);
+    console.log('[Ramadan] Tile mapping initialized.');
+
     registerServiceWorker();
     createFloatingSymbols();
     startShootingStars();
 
     showLoading(true);
 
-    // Load tasks from Supabase (or fallback)
-    await loadDailyTasks();
+    try {
+        // Load tasks from Supabase (or fallback)
+        await loadDailyTasks();
 
-    // Load children & progress
-    await loadFamilyData();
+        // Load children & progress
+        await loadFamilyData();
 
-    buildMosaicGrid();
-    buildCalendarGrid();
-    setupModal();
-    updateTilesCounter();
-
-    showLoading(false);
+        buildMosaicGrid();
+        buildCalendarGrid();
+        setupModal();
+        updateTilesCounter();
+    } catch (err) {
+        console.error('[Ramadan] Initialization error:', err);
+    } finally {
+        showLoading(false);
+    }
 });
 
 // ========== LOADING ==========
@@ -249,8 +259,13 @@ async function loadFamilyData() {
 
             if (!error && data) {
                 childrenData = data.children || [];
-                console.log('[Ramadan] Family data loaded from Supabase.');
+                console.log('[Ramadan] Family data loaded from Supabase. Children:', childrenData.length);
             } else {
+                if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned" for .single()
+                    console.error('[Ramadan] Supabase load error:', error);
+                } else {
+                    console.log('[Ramadan] No family record found in Supabase for ID:', familyId);
+                }
                 // Family not in DB yet, try localStorage
                 loadFromLocalStorage();
             }

@@ -406,14 +406,21 @@
             // Save to Supabase (Secure Cloud Backup)
             if (supabaseClient && familyId) {
                 try {
-                    // We save full data including images to Supabase for the login persistence
-                    await supabaseClient.from('families').upsert({
+                    const { error: sbError } = await supabaseClient.from('families').upsert({
                         family_id: familyId,
                         children: children, // Including Base64 images
                         updated_at: new Date().toISOString()
                     }, { onConflict: 'family_id' });
+
+                    if (sbError) {
+                        console.error('[Setup] Supabase save error:', sbError);
+                        showToast('Fehler bei Cloud-Speicherung: ' + sbError.message, true);
+                        return; // Stop if cloud save failed
+                    }
                 } catch (e) {
                     console.warn('[Setup] Supabase save failed:', e);
+                    showToast('Cloud-Verbindung fehlgeschlagen.', true);
+                    return;
                 }
             }
 
