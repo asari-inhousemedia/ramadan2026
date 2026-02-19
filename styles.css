@@ -279,7 +279,7 @@ a:hover {
 
 .main-title {
     font-family: var(--font-display);
-    font-size: clamp(1.8rem, 6vw, 3rem);
+    font-size: clamp(2rem, 5vw, 3rem);
     font-weight: 700;
     color: var(--gold-light);
     text-shadow:
@@ -287,8 +287,20 @@ a:hover {
         0 4px 0 #a07a10,
         0 0 20px rgba(245, 200, 66, 0.45),
         0 0 50px rgba(245, 200, 66, 0.2);
-    line-height: 1.1;
-    white-space: nowrap;
+    line-height: 1.2;
+    white-space: normal;
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+    .main-title {
+        font-size: 1.7rem;
+        /* Etwas kleiner für Mobile */
+        text-shadow:
+            0 2px 0 var(--gold-dark),
+            0 0 10px rgba(245, 200, 66, 0.3);
+        /* Weniger Shadow für Klarheit */
+    }
 }
 
 .main-subtitle {
