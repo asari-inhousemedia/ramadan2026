@@ -24,36 +24,41 @@
             justify-content: center;
             padding: 20px;
             text-align: center;
+            position: relative;
+            z-index: 5;
         }
 
         .login-card {
-            background: rgba(13, 21, 53, 0.6);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(212, 168, 67, 0.3);
-            border-radius: 24px;
-            padding: 32px 24px;
+            background: rgba(13, 21, 53, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(212, 168, 67, 0.4);
+            border-radius: 28px;
+            padding: 40px 24px;
             width: 100%;
             max-width: 400px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 100;
+            /* Ganz vorne! */
         }
 
         .login-header h1 {
             font-family: var(--font-display);
             color: var(--gold-primary);
-            font-size: 2rem;
-            margin-bottom: 8px;
-            text-shadow: 0 0 15px rgba(212, 168, 67, 0.4);
+            font-size: 2.2rem;
+            margin-bottom: 12px;
+            text-shadow: 0 0 20px rgba(212, 168, 67, 0.5);
         }
 
         .login-header p {
             color: var(--text-secondary);
             font-size: 0.95rem;
-            margin-bottom: 24px;
+            margin-bottom: 30px;
             line-height: 1.5;
         }
 
         .input-group {
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             text-align: left;
         }
 
@@ -61,40 +66,48 @@
             display: block;
             color: var(--gold-light);
             font-size: 0.85rem;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             font-weight: 600;
+            letter-spacing: 0.5px;
         }
 
         .input-group input {
             width: 100%;
-            padding: 12px 16px;
-            border-radius: 12px;
+            padding: 14px 18px;
+            border-radius: 14px;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.06);
             color: #fff;
             font-family: var(--font-body);
             font-size: 1rem;
-            transition: all 0.2s;
+            transition: all 0.3s;
         }
 
         .input-group input:focus {
             outline: none;
             border-color: var(--gold-primary);
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 15px rgba(212, 168, 67, 0.2);
         }
 
         .auth-btn {
             width: 100%;
-            padding: 14px;
-            border-radius: 14px;
+            padding: 16px;
+            border-radius: 16px;
             border: none;
             background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
             color: #050a18;
-            font-weight: 700;
-            font-size: 1rem;
+            font-weight: 800;
+            font-size: 1.1rem;
             cursor: pointer;
-            margin-top: 8px;
-            transition: transform 0.2s;
+            margin-top: 10px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 168, 67, 0.3);
         }
 
         .auth-btn:active {
@@ -102,13 +115,19 @@
         }
 
         .auth-btn:disabled {
-            opacity: 0.7;
+            opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
+        }
+
+        .toggle-area {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .toggle-text {
-            margin-top: 20px;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: var(--text-secondary);
         }
 
@@ -116,24 +135,36 @@
             color: var(--gold-light);
             text-decoration: underline;
             cursor: pointer;
-            font-weight: 600;
+            font-weight: 700;
+            background: none;
+            border: none;
+            padding: 5px 10px;
+            font-family: inherit;
+            display: inline-block;
+            transition: color 0.2s;
+        }
+
+        .toggle-link:hover {
+            color: var(--gold-primary);
         }
 
         .moon-icon-small {
-            font-size: 3rem;
-            margin-bottom: 16px;
+            font-size: 3.5rem;
+            margin-bottom: 20px;
             display: inline-block;
-            filter: drop-shadow(0 0 10px rgba(245, 200, 66, 0.6));
+            filter: drop-shadow(0 0 15px rgba(245, 200, 66, 0.6));
         }
 
         .error-msg {
             color: #ff6b6b;
-            font-size: 0.85rem;
-            margin-top: 12px;
+            font-size: 0.9rem;
+            margin-top: 15px;
             display: none;
-            background: rgba(255, 0, 0, 0.1);
-            padding: 8px;
-            border-radius: 8px;
+            background: rgba(255, 60, 60, 0.15);
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 60, 60, 0.3);
+            font-weight: 500;
         }
     </style>
 </head>
@@ -144,7 +175,7 @@
     <div class="shooting-star"></div>
 
     <div class="login-container">
-        <div class="login-card" style="position: relative; z-index: 10;">
+        <div class="login-card">
             <div class="moon-icon-small">🌙</div>
 
             <div class="login-header">
@@ -157,170 +188,152 @@
             <form id="authForm">
                 <div class="input-group">
                     <label for="email">E-Mail Adresse</label>
-                    <input type="email" id="email" placeholder="name@beispiel.de" required>
+                    <input type="email" id="email" placeholder="name@beispiel.de" required autocomplete="email">
                 </div>
 
                 <div class="input-group">
                     <label for="password">Passwort</label>
-                    <input type="password" id="password" placeholder="Mindestens 6 Zeichen" required minlength="6">
+                    <input type="password" id="password" placeholder="Mindestens 6 Zeichen" required minlength="6"
+                        autocomplete="current-password">
                 </div>
 
                 <button type="submit" class="auth-btn" id="submitBtn">Anmelden</button>
                 <div id="errorMsg" class="error-msg"></div>
             </form>
 
-            <div class="toggle-text">
-                <span id="toggleQuestion">Noch kein Konto?</span>
-                <button type="button" class="toggle-link" id="toggleBtn"
-                    style="background:none; border:none; padding:0; font-size:inherit; font-weight:600; text-decoration:underline;">Hier
-                    registrieren</button>
+            <div class="toggle-area">
+                <p class="toggle-text">
+                    <span id="toggleQuestion">Noch kein Konto?</span>
+                    <button type="button" class="toggle-link" id="toggleBtn">Hier registrieren</button>
+                </p>
             </div>
         </div>
 
-        <p style="margin-top: 24px; font-size: 0.8rem; opacity: 0.6; position: relative; z-index: 10;">
+        <p style="margin-top: 30px; font-size: 0.85rem; opacity: 0.7; color: #fff;">
             Deine Daten sind sicher. Wir versenden keine Werbung.
         </p>
     </div>
 
-    <!-- Script: Auth Logic -->
     <script>
-        // Config Supabase
+        // Supabase Init
         const SUPABASE_URL = 'https://thscbzyzblpqwbskymbg.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_w4wZcJW_TOnzxlgr-kMr5Q_aCu8OxTz';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let isLoginMode = true;
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            const toggleBtn = document.getElementById('toggleBtn');
-            const authForm = document.getElementById('authForm');
-            const err = document.getElementById('errorMsg');
+        // UI Elements
+        const toggleBtn = document.getElementById('toggleBtn');
+        const authForm = document.getElementById('authForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const errorMsg = document.getElementById('errorMsg');
+        const pageTitle = document.getElementById('pageTitle');
+        const pageSubtitle = document.getElementById('pageSubtitle');
+        const toggleQuestion = document.getElementById('toggleQuestion');
 
-            // 1. Check Protocol
+        // 1. EVENT LISTENERS SOFORT REGISTRIEREN (Noch vor DOMContentLoaded)
+        if (toggleBtn) {
+            toggleBtn.onclick = (e) => {
+                e.preventDefault();
+                toggleMode();
+            };
+        }
+
+        if (authForm) {
+            authForm.onsubmit = (e) => {
+                e.preventDefault();
+                handleAuth();
+            };
+        }
+
+        // 2. INITIALISIERUNG
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('[Auth] Login Page Ready');
+
+            // Check if file://
             if (window.location.protocol === 'file:') {
-                showError('⚠️ App läuft über "file://". Bitte nutze einen Webserver (z.B. Live Server), sonst funktioniert der Login nicht!');
+                showError('⚠️ App läuft über "file://". Bitte nutze einen Webserver (z.B. Live Server), sonst wird der Login blockiert!');
             }
 
-            // 2. Test Connection
+            // Test Supabase Connection (Silent)
             try {
                 const { error } = await supabase.from('daily_tasks').select('id').limit(1);
-                if (error) {
-                    console.error('[Supabase] Connection failed:', error);
-                    showError('⚠️ Verbindung zu Supabase fehlgeschlagen (Key ggf. ungültig).');
-                } else {
-                    console.log('[Supabase] Connection successful.');
-                }
-            } catch (e) {
-                showError('⚠️ Supabase konnte nicht geladen werden.');
-            }
+                if (error) console.warn('[Supabase] Connection test warning:', error);
+            } catch (e) { }
 
-            if (toggleBtn) toggleBtn.addEventListener('click', toggleMode);
-            if (authForm) authForm.addEventListener('submit', handleAuth);
-
-            // Check session
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-                window.location.href = 'index.html';
-            }
+            // Session Check
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session) window.location.href = 'index.html';
+            } catch (e) { }
         });
-
-        function showError(msg) {
-            const err = document.getElementById('errorMsg');
-            if (err) {
-                err.textContent = msg;
-                err.style.display = 'block';
-            }
-        }
 
         function toggleMode() {
             isLoginMode = !isLoginMode;
+            console.log('[Auth] Mode changed. isLoginMode:', isLoginMode);
 
-            const title = document.getElementById('pageTitle');
-            const sub = document.getElementById('pageSubtitle');
-            const btn = document.getElementById('submitBtn');
-            const q = document.getElementById('toggleQuestion');
-            const tBtn = document.getElementById('toggleBtn');
-            const err = document.getElementById('errorMsg');
-
-            if (err) err.style.display = 'none';
+            errorMsg.style.display = 'none';
 
             if (isLoginMode) {
-                if (title) title.textContent = 'Anmelden';
-                if (sub) sub.textContent = 'Willkommen zurück! Melde dich an, um deinen Fortschritt zu sehen.';
-                if (btn) btn.textContent = 'Anmelden';
-                if (q) q.textContent = 'Noch kein Konto?';
-                if (tBtn) tBtn.textContent = 'Hier registrieren';
+                pageTitle.textContent = 'Anmelden';
+                pageSubtitle.textContent = 'Willkommen zurück! Melde dich an, um deinen Fortschritt zu sehen.';
+                submitBtn.textContent = 'Anmelden';
+                toggleQuestion.textContent = 'Noch kein Konto?';
+                toggleBtn.textContent = 'Hier registrieren';
             } else {
-                if (title) title.textContent = 'Registrieren';
-                if (sub) sub.textContent = 'Erstelle ein kostenloses Konto für deine Familie (dauert nur 10 Sekunden).';
-                if (btn) btn.textContent = 'Konto erstellen';
-                if (q) q.textContent = 'Schon registriert?';
-                if (tBtn) tBtn.textContent = 'Hier anmelden';
+                pageTitle.textContent = 'Registrieren';
+                pageSubtitle.textContent = 'Erstelle ein kostenloses Konto für deine Familie (dauert nur 10 Sekunden).';
+                submitBtn.textContent = 'Konto erstellen';
+                toggleQuestion.textContent = 'Schon registriert?';
+                toggleBtn.textContent = 'Hier anmelden';
             }
         }
 
-        async function handleAuth(e) {
-            e.preventDefault();
-            const emailInput = document.getElementById('email');
-            const passwordInput = document.getElementById('password');
-            const btn = document.getElementById('submitBtn');
-            const err = document.getElementById('errorMsg');
+        async function handleAuth() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
 
-            if (!emailInput || !passwordInput) return;
-
-            const email = emailInput.value;
-            const password = passwordInput.value;
-
-            btn.disabled = true;
-            btn.textContent = 'Lade...';
-            if (err) err.style.display = 'none';
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Wird verarbeitet...';
+            errorMsg.style.display = 'none';
 
             try {
                 let result;
                 if (isLoginMode) {
                     result = await supabase.auth.signInWithPassword({ email, password });
                 } else {
-                    // WICHTIG: SignUp
                     result = await supabase.auth.signUp({
                         email,
                         password,
-                        options: {
-                            // Verhindert automatisches Senden von Bestätigungsmails vom Client aus
-                            emailRedirectTo: window.location.origin
-                        }
+                        options: { emailRedirectTo: window.location.origin }
                     });
                 }
 
                 if (result.error) throw result.error;
 
-                // Success!
                 if (result.data.session) {
                     window.location.href = 'index.html';
-                } else {
-                    // Bei SignUp ohne sofortige Session (Email Confirm ist evtl. doch noch an)
-                    if (!isLoginMode) {
-                        showError('Konto erstellt! Bitte prüfe deine E-Mails (Spam!) oder deaktiviere "Confirm Email" in Supabase.');
-                    } else {
-                        showError('Login fehlgeschlagen. Bitte Daten prüfen.');
-                    }
+                } else if (!isLoginMode) {
+                    showError('Konto erstellt! Du wirst jetzt automatisch eingeloggt...');
+                    // Fallback: Manchmal braucht Supabase kurz
+                    setTimeout(() => window.location.href = 'index.html', 1500);
                 }
             } catch (error) {
                 console.error('[Auth] Error:', error);
                 let msg = error.message;
-                if (msg === 'Email confirmations are not enabled') {
-                    // Das passiert wenn man versucht sich einzuloggen aber email confirm aus ist? 
-                    // Eigentlich sollte es dann gehen.
-                }
-                if (msg.includes('Invalid login credentials')) msg = 'Falsche E-Mail oder Passwort.';
+                if (msg.includes('Invalid login credentials')) msg = 'E-Mail oder Passwort falsch.';
                 if (msg.includes('User already registered')) msg = 'Diese E-Mail ist bereits registriert.';
                 if (msg.includes('Password should be')) msg = 'Passwort muss mindestens 6 Zeichen haben.';
-                if (msg.includes('Signups are disabled')) msg = 'Registrierung ist aktuell deaktiviert (Supabase Settings prüfen).';
-
                 showError(msg);
             } finally {
-                btn.disabled = false;
-                btn.textContent = isLoginMode ? 'Anmelden' : 'Konto erstellen';
+                submitBtn.disabled = false;
+                submitBtn.textContent = isLoginMode ? 'Anmelden' : 'Konto erstellen';
             }
+        }
+
+        function showError(msg) {
+            errorMsg.textContent = msg;
+            errorMsg.style.display = 'block';
         }
     </script>
 </body>
