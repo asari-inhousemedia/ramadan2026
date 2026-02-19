@@ -431,14 +431,27 @@ function buildCalendarGrid() {
             day.classList.add('completed');
         }
 
+        // Datum prüfen: Ist der Tag schon erlaubt?
+        // Wenn i (Tür-Tag) > today (aktueller Ramadan-Tag), dann SPERREN
+        if (today !== null && i > today) {
+            day.classList.add('locked');
+            day.innerHTML = `<span class="lock-icon">🔒</span><span class="day-num">${i}</span>`;
+            // Kein Click-Event hinzufügen (bzw. Click abfangen)
+            day.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showToast(`⏳ Geduld! Diese Tür öffnet sich erst am ${i}. Tag.`);
+            });
+        } else {
+            // Offene Tür: Click erlaubt
+            day.addEventListener('click', () => openModal(i));
+            day.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') openModal(i);
+            });
+        }
+
         if (i === today) {
             day.classList.add('today');
         }
-
-        day.addEventListener('click', () => openModal(i));
-        day.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') openModal(i);
-        });
 
         grid.appendChild(day);
     }
@@ -446,13 +459,25 @@ function buildCalendarGrid() {
 
 // Get current Ramadan day (1–30) based on real date
 function getRamadanDay() {
-    const ramadanStart = new Date('2026-03-01');
+    // STARTDATUM: 19. Februar 2026
+    const ramadanStart = new Date('2026-02-19T00:00:00');
+
+    // HEUTE
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0); // Zeit ignorieren, nur Datum
     ramadanStart.setHours(0, 0, 0, 0);
-    const diff = Math.floor((today - ramadanStart) / (1000 * 60 * 60 * 24)) + 1;
-    if (diff < 1 || diff > 30) return null;
-    return diff;
+
+    // Differenz in Tagen
+    const diffTime = today - ramadanStart;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+    // Wenn vor Start: Tag 0 oder negativ
+    // Wenn nach Ende (30 Tage): > 30
+    // Wir geben den Tag zurück oder null, wenn außerhalb
+    if (diffDays < 1) return 0; // Noch nicht gestartet
+    if (diffDays > 30) return 31; // Vorbei
+
+    return diffDays;
 }
 
 // ========== MODAL ==========
