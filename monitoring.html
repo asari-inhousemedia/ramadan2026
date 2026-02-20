@@ -48,7 +48,30 @@
             margin-bottom: 24px;
         "></div>
 
-        <!-- Doors Grid -->
+        <!-- Recent Registrations -->
+        <div
+            style="max-width: 800px; margin: 0 auto 30px auto; background: rgba(13, 21, 53, 0.4); border-radius: var(--radius-lg); border: 1px solid rgba(212, 168, 67, 0.2); overflow: hidden;">
+            <div
+                style="padding: 15px 20px; border-bottom: 1px solid rgba(212,168,67,0.1); font-weight: 700; color: var(--gold-light); display: flex; justify-content: space-between; align-items: center;">
+                <span>Registered Children & Activity</span>
+                <span id="childTotal"
+                    style="font-size: 0.8rem; background: var(--bg-accent); padding: 2px 8px; border-radius: 10px; color: white;">...</span>
+            </div>
+            <div style="max-height: 400px; overflow-y: auto;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+                    <thead style="background: rgba(0,0,0,0.2); color: var(--text-secondary); position: sticky; top: 0;">
+                        <tr>
+                            <th style="padding: 12px 20px;">Family (Short ID)</th>
+                            <th style="padding: 12px 20px;">Child Name</th>
+                            <th style="padding: 12px 20px;">Stars ⭐</th>
+                        </tr>
+                    </thead>
+                    <tbody id="childrenTableBody">
+                        <!-- Built by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
         <div class="admin-grid" id="adminGrid">
             <!-- Built by JS -->
         </div>
@@ -125,41 +148,71 @@
                 } catch (e) { }
 
                 try {
-                    const { count } = await supabaseClient
+                    const { count: familyCount } = await supabaseClient
                         .from('families')
                         .select('*', { count: 'exact', head: true });
 
-                    renderStats(count || 0);
+                    const { data: progressList } = await supabaseClient
+                        .from('progress')
+                        .select('family_id, child_name, completed_tasks');
+
+                    renderStats(familyCount || 0, (progressList || []).length);
+                    renderChildrenList(progressList || []);
                 } catch (e) {
-                    renderStats('–');
+                    console.error('[Admin] Stats load error:', e);
+                    renderStats('–', '–');
                 }
             }
 
             renderDoors(tasks);
         }
 
-        function renderStats(familyCount) {
+        function renderChildrenList(list) {
+            const body = document.getElementById('childrenTableBody');
+            const total = document.getElementById('childTotal');
+            if (!body) return;
+
+            if (total) total.textContent = `${list.length} Kinder`;
+
+            if (list.length === 0) {
+                body.innerHTML = '<tr><td colspan="3" style="padding: 20px; text-align: center; color: var(--text-secondary);">Noch keine Kinder registriert.</td></tr>';
+                return;
+            }
+
+            body.innerHTML = list.map(item => `
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
+                    <td style="padding: 12px 20px; color: var(--text-secondary); font-family: monospace;">${item.family_id.substring(0, 8)}...</td>
+                    <td style="padding: 12px 20px; color: white; font-weight: 600;">${escapeHtml(item.child_name)}</td>
+                    <td style="padding: 12px 20px; color: var(--gold-light); font-weight: 700;">${(item.completed_tasks || []).length}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderStats(familyCount, childCount) {
             const container = document.getElementById('adminStats');
             if (!container) return;
 
             const stats = [
-                { label: 'Familien registriert', value: familyCount, icon: '👨‍👩‍👧‍👦' },
+                { label: 'Familien (Accounts)', value: familyCount, icon: '👨‍👩‍👧‍👦' },
+                { label: 'Kinder registriert', value: childCount, icon: '👧' },
                 { label: 'Tage aktiv', value: 30, icon: '🗓️' },
                 { label: 'System-Status', value: 'Live', icon: '🟢' }
             ];
 
             container.innerHTML = stats.map(s => `
                 <div style="
-                    background: linear-gradient(135deg, var(--bg-accent), var(--bg-mid));
-                    border: 1px solid rgba(212,168,67,0.2);
+                    background: linear-gradient(145deg, rgba(26, 37, 96, 0.9), rgba(17, 26, 66, 0.95));
+                    border: 1px solid rgba(212,168,67,0.22);
                     border-radius: var(--radius-md);
-                    padding: 16px 24px;
+                    padding: 16px 20px;
                     text-align: center;
-                    min-width: 140px;
+                    min-width: 130px;
+                    flex: 1;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
                 ">
-                    <div style="font-size: 1.8rem; margin-bottom: 6px;">${s.icon}</div>
-                    <div style="font-size: 1.4rem; font-weight: 700; color: var(--gold-light);">${s.value}</div>
-                    <div style="font-size: 0.78rem; color: var(--text-secondary);">${s.label}</div>
+                    <div style="font-size: 1.6rem; margin-bottom: 6px;">${s.icon}</div>
+                    <div style="font-size: 1.5rem; font-weight: 800; color: var(--gold-light);">${s.value}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 500;">${s.label}</div>
                 </div>
             `).join('');
         }

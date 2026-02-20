@@ -85,7 +85,7 @@
 
             // 2. Check families
             try {
-                const { error } = await client.from('families').select('id').limit(1);
+                const { error } = await client.from('families').select('family_id').limit(1);
                 if (error && error.code !== 'PGRST116') throw error; // PGRST116 is just "no rows", which is fine
                 log(`✅ Tabelle <code>families</code> ist bereit.`, 'success');
             } catch (e) {
