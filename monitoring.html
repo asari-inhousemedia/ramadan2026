@@ -148,19 +148,25 @@
                 } catch (e) { }
 
                 try {
-                    const { count: familyCount } = await supabaseClient
+                    // Fetch all families to analyze setup state
+                    const { data: families } = await supabaseClient
                         .from('families')
-                        .select('*', { count: 'exact', head: true });
+                        .select('children');
 
+                    // Fetch progress to see active kids & stars
                     const { data: progressList } = await supabaseClient
                         .from('progress')
                         .select('family_id, child_name, completed_tasks');
 
-                    renderStats(familyCount || 0, (progressList || []).length);
+                    const totalReg = families ? families.length : 0;
+                    const setupDone = families ? families.filter(f => f.children && f.children.length > 0).length : 0;
+                    const childCount = progressList ? progressList.length : 0;
+
+                    renderStats(totalReg, setupDone, childCount);
                     renderChildrenList(progressList || []);
                 } catch (e) {
                     console.error('[Admin] Stats load error:', e);
-                    renderStats('–', '–');
+                    renderStats('–', '–', '–');
                 }
             }
 
@@ -188,15 +194,15 @@
             `).join('');
         }
 
-        function renderStats(familyCount, childCount) {
+        function renderStats(totalReg, setupDone, childCount) {
             const container = document.getElementById('adminStats');
             if (!container) return;
 
             const stats = [
-                { label: 'Familien (Accounts)', value: familyCount, icon: '👨‍👩‍👧‍👦' },
-                { label: 'Kinder registriert', value: childCount, icon: '👧' },
-                { label: 'Tage aktiv', value: 30, icon: '🗓️' },
-                { label: 'System-Status', value: 'Live', icon: '🟢' }
+                { label: 'Registrierungen (Total)', value: totalReg, icon: '📧' },
+                { label: 'Eingerichtete Familien', value: setupDone, icon: '🏠' },
+                { label: 'Kinder Gesamt', value: childCount, icon: '🧒' },
+                { label: 'Status', value: 'Live', icon: '🟢' }
             ];
 
             container.innerHTML = stats.map(s => `
@@ -204,15 +210,15 @@
                     background: linear-gradient(145deg, rgba(26, 37, 96, 0.9), rgba(17, 26, 66, 0.95));
                     border: 1px solid rgba(212,168,67,0.22);
                     border-radius: var(--radius-md);
-                    padding: 16px 20px;
+                    padding: 16px 15px;
                     text-align: center;
-                    min-width: 130px;
+                    min-width: 120px;
                     flex: 1;
                     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
                 ">
-                    <div style="font-size: 1.6rem; margin-bottom: 6px;">${s.icon}</div>
-                    <div style="font-size: 1.5rem; font-weight: 800; color: var(--gold-light);">${s.value}</div>
-                    <div style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 500;">${s.label}</div>
+                    <div style="font-size: 1.4rem; margin-bottom: 4px;">${s.icon}</div>
+                    <div style="font-size: 1.4rem; font-weight: 800; color: var(--gold-light);">${s.value}</div>
+                    <div style="font-size: 0.7rem; color: var(--text-secondary); font-weight: 500; line-height: 1.2;">${s.label}</div>
                 </div>
             `).join('');
         }

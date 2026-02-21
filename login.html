@@ -529,6 +529,28 @@
 
                 if (result.error) throw result.error;
 
+                // Ensure a 'families' entry exists to track registrations
+                if (result.data && result.data.user) {
+                    try {
+                        const { data: existing } = await client
+                            .from('families')
+                            .select('family_id')
+                            .eq('family_id', result.data.user.id)
+                            .single();
+
+                        if (!existing) {
+                            await client.from('families').insert({
+                                family_id: result.data.user.id,
+                                children: [],
+                                updated_at: new Date().toISOString()
+                            });
+                            console.log('[Auth] New family entry created for tracking.');
+                        }
+                    } catch (e) {
+                        console.warn('[Auth] Tracking failed:', e);
+                    }
+                }
+
                 if (result.data && result.data.session) {
                     window.location.href = 'index.html';
                 } else if (!window.isLoginMode) {
