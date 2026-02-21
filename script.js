@@ -6,7 +6,7 @@
 // ========== SUPABASE CONFIG ==========
 const SUPABASE_URL = 'https://thscbzyzblpqwbskymbg.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_w4wZcJW_TOnzxlgr-kMr5Q_aCu8OxTz';
-const APP_VERSION = '1.1.7';
+const APP_VERSION = '1.1.8';
 
 let supabaseClient = null;
 try {
