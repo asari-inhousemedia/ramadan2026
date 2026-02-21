@@ -910,19 +910,17 @@ function updateImageBlur() {
     if (!img || img.style.display === 'none') return;
 
     const revealed = revealedTiles.length;
-    const total = 30;
+    const total = 90; // Fixed for 90 tiles
 
     if (revealed >= total) {
-        // Tag 30: Bild kristallklar!
+        // Tag 30 (alle Aufgaben): Bild kristallklar!
         img.style.filter = 'none';
     } else {
-        // Bis Tag 29 bleibt es "milchig" (mind. 6px Blur), um Spannung zu halten
+        // Progress reveal: Von 30px Blur -> 6px Blur
         const progress = revealed / total;
-
-        // Start: 25px Blur -> Ende (Tag 29): 6px Blur
         const minBlur = 6;
         const maxBlur = 30;
-        const blurAmount = maxBlur - (progress * (maxBlur - minBlur));
+        const blurAmount = Math.max(minBlur, maxBlur - (progress * (maxBlur - minBlur)));
 
         // Sättigung und Helligkeit langsam erhöhen
         const saturation = 0.4 + progress * 0.6; // Von 40% auf 100%
@@ -1131,10 +1129,10 @@ async function markTaskCompleted(taskId, dayNum) {
     completedTasks.push(taskId);
 
     // Reveal a unique tile for EVERY task
-    // Find the global index of this task in the 90 tasks list
     const taskIndex = dailyTasks.findIndex(t => t.id === taskId);
     if (taskIndex !== -1) {
         const tileIdx = tileMapping[taskIndex];
+        // Correct check: check if the PHYSICAL TILE is already revealed
         if (!revealedTiles.includes(tileIdx)) {
             revealRandomTile(taskIndex);
         }
@@ -1175,19 +1173,22 @@ async function markTaskCompleted(taskId, dayNum) {
     // Refresh the modal to show the checkmark
     openModal(dayNum);
 
-    // Day 30 celebration
-    if (dayNum === 30 && revealedTiles.length >= 30) {
+    // Day 30 celebration (only when ALL 90 tiles are open)
+    if (dayNum === 30 && revealedTiles.length >= 90) {
         setTimeout(showCelebration, 800);
     }
 }
 
 // ========== REVEAL TILE (90-Tile System) ==========
 function revealRandomTile(taskIdx) {
-    if (revealedTiles.includes(taskIdx)) return;
-
     // Use tileMapping to find which physical tile (0-89) to reveal
     const tileIndex = tileMapping[taskIdx];
-    revealedTiles.push(taskIdx);
+    if (tileIndex === undefined) return;
+
+    // Check if THIS PHYSICAL TILE is already in the list
+    if (revealedTiles.includes(tileIndex)) return;
+
+    revealedTiles.push(tileIndex); // STORE THE TILE INDEX, NOT TASK INDEX
 
     const tile = document.getElementById(`mosaic-tile-${tileIndex}`);
     if (tile) {
