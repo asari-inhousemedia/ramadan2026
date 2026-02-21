@@ -375,34 +375,39 @@
             }
         }
 
-        function showResetMode() {
-            window.isResetMode = true;
+        function showResetMode(show = true) {
+            window.isResetMode = show;
+            window.isLoginMode = !show;
 
             const title = document.getElementById('pageTitle');
             const sub = document.getElementById('pageSubtitle');
             const btn = document.getElementById('submitBtn');
             const q = document.getElementById('toggleQuestion');
             const tLink = document.getElementById('toggleBtn');
+            const pwGroup = document.getElementById('passwordGroup');
+            const confirmGroup = document.getElementById('confirmPasswordGroup');
+            const forgotArea = document.getElementById('forgotPwArea');
+            const privacyArea = document.getElementById('privacyArea');
 
-            title.innerText = t('reset_title');
-            title.dataset.i18n = 'reset_title';
+            if (show) {
+                title.innerText = t('reset_title');
+                title.dataset.i18n = 'reset_title';
+                sub.innerText = t('reset_subtitle');
+                sub.dataset.i18n = 'reset_subtitle';
+                btn.innerText = t('reset_btn');
+                btn.dataset.i18n = 'reset_btn';
+                q.innerText = t('reset_back_question', { defaultValue: 'Doch wieder einloggen?' });
+                q.dataset.i18n = 'reset_back_question';
+                tLink.innerText = t('reset_back_link', { defaultValue: 'Zum Login' });
+                tLink.dataset.i18n = 'reset_back_link';
 
-            sub.innerText = t('reset_subtitle');
-            sub.dataset.i18n = 'reset_subtitle';
-
-            btn.innerText = t('reset_btn');
-            btn.dataset.i18n = 'reset_btn';
-
-            q.innerText = t('reset_back_question');
-            q.dataset.i18n = 'reset_back_question';
-
-            tLink.innerText = t('reset_back_link');
-            tLink.dataset.i18n = 'reset_back_link';
-
-            document.getElementById('passwordGroup').style.display = 'none';
-            document.getElementById('confirmPasswordGroup').style.display = 'none';
-            document.getElementById('forgotPwArea').style.display = 'none';
-            document.getElementById('privacyArea').style.display = 'none';
+                if (pwGroup) pwGroup.style.display = 'none';
+                if (confirmGroup) confirmGroup.style.display = 'none';
+                if (forgotArea) forgotArea.style.display = 'none';
+                if (privacyArea) privacyArea.style.display = 'none';
+            } else {
+                doToggle(); // Nutze die bestehende Toggle-Logik für Login
+            }
         }
 
         function doToggle() {
