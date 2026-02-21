@@ -541,6 +541,9 @@ function initFamilyId() {
 function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js').then((reg) => {
+            console.log('[PWA] ServiceWorker registered.');
+
+            // Listen for updates
             reg.addEventListener('updatefound', () => {
                 const newWorker = reg.installing;
                 newWorker.addEventListener('statechange', () => {
@@ -549,14 +552,44 @@ function registerServiceWorker() {
                     }
                 });
             });
-        }).catch(() => { });
+
+            // Check for updates whenever the app is re-opened or focused
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') {
+                    console.log('[PWA] Checking for updates...');
+                    reg.update();
+                }
+            });
+
+            // Periodically check for updates (every 30 minutes)
+            setInterval(() => {
+                console.log('[PWA] Periodic update check...');
+                reg.update();
+            }, 30 * 60 * 1000);
+
+        }).catch((e) => {
+            console.warn('[PWA] Registration failed:', e);
+        });
     }
 }
 
 function showUpdateBanner(worker) {
-    const banner = document.getElementById('updateBanner');
+    let banner = document.getElementById('updateBanner');
+
+    // Inject banner if it doesn't exist on this page
+    if (!banner) {
+        banner = document.createElement('div');
+        banner.id = 'updateBanner';
+        banner.className = 'update-banner';
+        banner.innerHTML = `
+            <span>🔄 Neue Version verfügbar!</span>
+            <button class="update-btn" id="updateBtn">Jetzt aktualisieren</button>
+        `;
+        document.body.prepend(banner);
+    }
+
     const btn = document.getElementById('updateBtn');
-    if (!banner || !btn) return;
+    if (!btn) return;
 
     banner.style.display = 'flex';
 
@@ -568,9 +601,9 @@ function showUpdateBanner(worker) {
     });
 }
 
-// ========== INIT ==========
 document.addEventListener('DOMContentLoaded', async () => {
-    // ALWAYS initialize translations first
+    // 0. Register Service Worker and I18N (Always)
+    registerServiceWorker();
     setupLanguageSwitcher();
     updateUI();
 
@@ -601,11 +634,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     tileMapping = seededShuffle(indices, seed);
     console.log('[Ramadan] Tile mapping (90) initialized.');
 
-    // Initialize translations
-    setupLanguageSwitcher();
-    updateUI();
-
-    registerServiceWorker();
     createFloatingSymbols();
     startShootingStars();
     setupModal();
