@@ -471,14 +471,17 @@ function updateUI() {
 // ========== UTILS ==========
 function sanitize(str) {
     if (typeof str !== 'string') return '';
-    return str
+    const trimmed = str.trim();
+    // If string already contains common HTML entities, don't re-sanitize to avoid double encoding
+    if (trimmed.includes('&amp;') || trimmed.includes('&lt;') || trimmed.includes('&gt;')) {
+        return trimmed;
+    }
+    return trimmed
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#x27;')
-        .trim()
-        .slice(0, 2000);
+        .replace(/'/g, '&#x27;');
 }
 
 function generateUUID() {
@@ -804,11 +807,12 @@ function renderChildTabs() {
         tab.className = 'child-tab';
 
         // Find star count for this child
-        const childProg = allProgressData.find(p => p.child_name === child.name);
-        const starCount = childProg ? (childProg.completed_tasks || []).length : 0; // Updated property
+        const childName = (child.name || '').trim();
+        const childProg = allProgressData.find(p => (p.child_name || '').trim() === childName);
+        const starCount = childProg ? (childProg.completed_tasks || []).length : 0;
 
-        tab.innerHTML = `<span>${sanitize(child.name)}</span> <span class="tab-star">⭐ ${starCount}</span>`;
-        tab.setAttribute('aria-label', `${sanitize(child.name)}: ${starCount} Sterne gesammelt`);
+        tab.innerHTML = `<span>${childName}</span> <span class="tab-star">⭐ ${starCount}</span>`;
+        tab.setAttribute('aria-label', `${childName}: ${starCount} Sterne gesammelt`);
 
         if (currentChild && child.name === currentChild.name) {
             tab.classList.add('active');
