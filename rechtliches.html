@@ -69,15 +69,14 @@
             </li>
             <li><strong>Fortschritt</strong> – welche Türen geöffnet wurden (als Nummernliste)</li>
             <li><strong>Familien-ID</strong> – eine zufällig generierte, anonyme UUID (kein Bezug zu einer Person)</li>
-            <li><strong>Geschenk-Bild</strong> – wird <u>ausschließlich lokal</u> auf deinem Gerät gespeichert
-                (localStorage), niemals auf externen Servern.</li>
+            <li><strong>Geschenk-Bild</strong> – wird sicher in unserem Cloud-Speicher (Supabase Storage) gespeichert,
+                damit es auf all deinen Geräten verfügbar ist.</li>
         </ul>
 
         <h2>2. Wo werden die Daten gespeichert?</h2>
         <ul>
-            <li><strong>Lokal</strong> auf deinem Gerät (localStorage) – das <strong>Geschenk-Bild</strong> verlässt
-                dein
-                Gerät niemals.</li>
+            <li><strong>Supabase Storage</strong> – speichert das <strong>Geschenk-Bild</strong> verschlüsselt in der
+                Cloud, damit du es auf Handy und Tablet gleichzeitig sehen kannst.</li>
             <li><strong>Supabase</strong> (seriöser Datenbankanbieter) – speichert zur Synchronisation:
                 anonyme Family-ID, Kindervornamen und den Fortschritt (geöffnete Türen).</li>
         </ul>
@@ -117,11 +116,11 @@
         </p>
 
         <p style="margin-top: 32px; font-size: 0.8rem; color: var(--text-secondary); opacity: 0.6;">
-            Stand: Februar 2026 · Version 1.0.0
+            Stand: Februar 2026 · Version 1.2.2
         </p>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="script.js?v=1.1.7"></script>
+    <script src="script.js?v=1.2.2"></script>
 </body>
 
 </html>

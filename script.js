@@ -6,7 +6,7 @@
 // ========== SUPABASE CONFIG ==========
 const SUPABASE_URL = 'https://thscbzyzblpqwbskymbg.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_w4wZcJW_TOnzxlgr-kMr5Q_aCu8OxTz';
-const APP_VERSION = '1.1.8';
+const APP_VERSION = '1.2.2';
 
 let supabaseClient = null;
 try {
@@ -1191,7 +1191,7 @@ async function markTaskCompleted(taskId, dayNum) {
 
     // Update local score cache for tabs
     if (currentChild) {
-        const idx = allProgressData.findIndex(p => p.child_name === currentChild.name);
+        const idx = allProgressData.findIndex(p => (p.child_name || '').trim() === (currentChild.name || '').trim());
         if (idx !== -1) {
             allProgressData[idx].completed_tasks = [...completedTasks];
         } else {
